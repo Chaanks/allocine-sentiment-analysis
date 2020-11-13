@@ -7,17 +7,17 @@ import re
 def xml_to_json(filename: str):
     """
     Convert an `.xml` file to a `.json` file given the following tree structure:
-    <comments>
-        <comment>
-            <movie>       {int}   </movie>
-            <review_id>   {str}   </review_id>
-            <name>        {str}   </name>
-            <user_id>     {str}   </user_id>
-            <note>        {float} </note>
-            <commentaire> {str}   </commentaire>
-        </comment>
-        ...
-     </comments>
+        <comments>
+            <comment>
+                <movie>       {int}   </movie>
+                <review_id>   {str}   </review_id>
+                <name>        {str}   </name>
+                <user_id>     {str}   </user_id>
+                <note>        {float} </note>
+                <commentaire> {str}   </commentaire>
+            </comment>
+            ...
+         </comments>
     
     Parameter
     ---------
