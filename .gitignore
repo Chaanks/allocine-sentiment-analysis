@@ -1,4 +1,4 @@
 .ipynb_checkpoints
 __pycache__
-data/raw
-json/*.json
+data/
+
