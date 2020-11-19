@@ -5,7 +5,6 @@ import pathlib
 import re
 import shutil
 import math
-import spacy
 
 from pathlib import Path, PurePath
 
@@ -84,11 +83,6 @@ def tokenize_comment(comment, nlp_model=None ) -> list:
 
     return [ { 'text': word } for word in tokens ]
 
-
-def json_to_ndjson(
-    json_file       : Path, 
-    out_folder      : Path, 
-    limit           : int  = 200_000, 
     es_index        : str  = 'movie_db',
     movie_additional: Path = None
 ):
@@ -150,8 +144,8 @@ def json_to_ndjson(
     open(out_folder / f'{basename}_{num_part}.ndjson', "w").close()
     
     for idx, review in enumerate(raw_dataset):
-        review['lst_mots']  = tokenize_comment(review['commentaire'], nlp)
-        review['num_chars'] = sum(len(token) for token in review['lst_mots'])
+        review['lst_mots']       = tokenize_comment(review['commentaire'])
+        review['num_chars']      = sum(len(token) for token in review['lst_mots'])
         
         if extra_info is not None:
             movie_id = review['movie']['id']
@@ -160,11 +154,9 @@ def json_to_ndjson(
             
             review['movie']['category'] = extra_info[movie_id]['category']
             
+            avg_note = None
             is_users = False
-            for content in extra_info[movie_id]['data']:
-                if content.strip().lower() == 'spectateurs':
                     is_users = True
-                else:
                     try:
                         content = float(content.strip().replace(',', '.'))
                         if not math.isnan(content) and is_users:
@@ -172,15 +164,9 @@ def json_to_ndjson(
                             break
                     except ValueError:
                         continue
-           
         if idx % limit == limit - 1:
-            # The maximum number of entries has been reached, we need to 
-            # register the next comments to a new file
-            num_part   += 1
             open(out_folder / f'{basename}_{num_part}.ndjson', "w").close()
-        
-        # Registers data into the current `.ndjson` output file
-        with open(out_folder / f'{basename}_{num_part}.ndjson', "a+") as file:
+            # Registers data into the current `.ndjson` output file
             file.write(f'{json.dumps(es_idx, ensure_ascii=False)}\n')
             file.write(f'{json.dumps(review, ensure_ascii=False)}\n')
 
@@ -227,7 +213,7 @@ def xml_to_ndjson(
     json_file = json_folder / f'{basename}.json'
     
     print(f'\033[1;33mParsing \033[1;37m{xml_file}\033[1;33m file..\033[0m', end=' ')
-    xml_to_json(xml_file, json_file)
+    xml_to_json(xml_file,  json_file)
     print(f'\033[1;34mDone!\033[0m')
     
     # Parse raw `.json` movie reviews (i.e. directly extracted from the `.xml` 
