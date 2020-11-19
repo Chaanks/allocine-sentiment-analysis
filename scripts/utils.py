@@ -5,6 +5,7 @@ import pathlib
 import re
 import shutil
 import math
+import spacy
 
 from pathlib import Path, PurePath
 
@@ -51,29 +52,37 @@ def xml_to_json(xml_file: Path, json_file: Path):
         json.dump(comments, file, ensure_ascii=False)
 
 
-def tokenize_comment(comment: str) -> list:
+def tokenize_comment(comment, nlp_model=None ) -> list:
     """
     Tokenize a `comment` by removing hyperlinks, punctuation and extra spaces.
     
     Parameter
     ---------
-    comment: str
+    comment  : str
         String to tokenize
-    
+    nlp_model: optional (default: None)
+        NLP model to load for special tokenization (in particular stop words 
+        removal during the tokenization filtering phase).
+
     Returns
     -------
     list(str)
         The list of tokens extracted from the original comment
     """
-    re_punctuation = re.compile(r"[^(a-z)|#|@|è|é|à|ù|ü|ë|ä|û|î|ê|â\s]")
+    re_punctuation = re.compile(r"[^(a-z)|#|@|è|é|à|ù|ü|ë|ä|û|î|ê|â|ç\s]")
     re_hyperlink   = re.compile(r"http\S+")
     re_extra_space = re.compile(r"\s+")
     
-    tmp            = re_hyperlink.sub(' ', comment.lower())
-    tmp            = re_punctuation.sub(' ', tmp)
-    tmp            = re_extra_space.sub(' ', tmp)
-    
-    return [ { 'text': word } for word in tmp.split() ]
+    tokens = re_hyperlink.sub(' ', comment.lower())
+    tokens = re_punctuation.sub(' ', tokens)
+    tokens = re_extra_space.sub(' ', tokens)
+    tokens = [ token for token in tokens.split() if len(token) > 1 ]
+
+    # Filtering out stop words from the `tmp` list
+    if nlp_model is not None:
+        tokens = [ token for token in tokens if not nlp_model.vocab[token].is_stop ]
+
+    return [ { 'text': word } for word in tokens ]
 
 
 def json_to_ndjson(
@@ -131,12 +140,18 @@ def json_to_ndjson(
     num_elts   = len(raw_dataset)
     num_digits = len(f'{num_elts:_d}')
     
+    # Loading SpaCy model from tokenization utilities
+    print(f'\033[0;37mLoading SpaCy en_core_web_sm model..\033[0m', end=' ')
+    spacy.prefer_gpu()
+    nlp = spacy.load("fr_core_news_sm")
+    print('\033[0;34mDone!\033[0m')
+
     # Clears first file to edit, in case of previous data registration
     open(out_folder / f'{basename}_{num_part}.ndjson', "w").close()
     
     for idx, review in enumerate(raw_dataset):
-        review['lst_mots']       = tokenize_comment(review['commentaire'])
-        review['num_chars']      = sum(len(token) for token in review['lst_mots'])
+        review['lst_mots']  = tokenize_comment(review['commentaire'], nlp)
+        review['num_chars'] = sum(len(token) for token in review['lst_mots'])
         
         if extra_info is not None:
             movie_id = review['movie']['id']
@@ -145,7 +160,6 @@ def json_to_ndjson(
             
             review['movie']['category'] = extra_info[movie_id]['category']
             
-            avg_note = None
             is_users = False
             for content in extra_info[movie_id]['data']:
                 if content.strip().lower() == 'spectateurs':
@@ -158,9 +172,7 @@ def json_to_ndjson(
                             break
                     except ValueError:
                         continue
-             
-        
-                        
+           
         if idx % limit == limit - 1:
             # The maximum number of entries has been reached, we need to 
             # register the next comments to a new file
@@ -215,10 +227,11 @@ def xml_to_ndjson(
     json_file = json_folder / f'{basename}.json'
     
     print(f'\033[1;33mParsing \033[1;37m{xml_file}\033[1;33m file..\033[0m', end=' ')
-    xml_to_json(xml_file,  json_file)
+    xml_to_json(xml_file, json_file)
     print(f'\033[1;34mDone!\033[0m')
     
     # Parse raw `.json` movie reviews (i.e. directly extracted from the `.xml` 
     # movie reviews) file into a `.ndjson` file.
     print(f'\033[1;33mGenerating corresponding .ndjson file to \033[1;37m{es_folder}\033[1;33m ..\033[0m')
     json_to_ndjson(json_file, es_folder, movie_additional = movie_additional, limit = 10_000)
+    
