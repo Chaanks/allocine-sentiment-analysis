@@ -6,6 +6,7 @@ import re
 import shutil
 import math
 import spacy
+from tqdm import tqdm
 
 from pathlib import Path, PurePath
 
@@ -69,10 +70,10 @@ def tokenize_comment(comment, nlp_model=None ) -> list:
     list(str)
         The list of tokens extracted from the original comment
     """
-    re_punctuation = re.compile(r"[^(a-z)|#|@|è|é|à|ù|ü|ë|ä|û|î|ê|â|ç\s]")
+    re_punctuation = re.compile(r"[^\d|(a-z)|#|@|è|é|à|ù|ô|ü|ë|ä|û|î|ê|â|ç\s]")
     re_hyperlink   = re.compile(r"http\S+")
     re_extra_space = re.compile(r"\s+")
-    re_repetition = re.compile(r'(.+?)\1+')
+    re_repetition  = re.compile(r'(.+?)\1+')
     
     tokens = re_hyperlink.sub(' ', comment.lower())
     tokens = re_punctuation.sub(' ', tokens)
