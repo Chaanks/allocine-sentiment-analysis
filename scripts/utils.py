@@ -72,10 +72,12 @@ def tokenize_comment(comment, nlp_model=None ) -> list:
     re_punctuation = re.compile(r"[^(a-z)|#|@|è|é|à|ù|ü|ë|ä|û|î|ê|â|ç\s]")
     re_hyperlink   = re.compile(r"http\S+")
     re_extra_space = re.compile(r"\s+")
+    re_repetition = re.compile(r'(.+?)\1+')
     
     tokens = re_hyperlink.sub(' ', comment.lower())
     tokens = re_punctuation.sub(' ', tokens)
     tokens = re_extra_space.sub(' ', tokens)
+    tokens = re_repetition.sub(r'\1\1', tokens)
     tokens = [ token for token in tokens.split() if len(token) > 1 ]
 
     # Filtering out stop words from the `tmp` list
@@ -144,8 +146,14 @@ def json_to_ndjson(
     print(f'\033[0;37mLoading SpaCy en_core_web_sm model..\033[0m', end=' ')
     spacy.prefer_gpu()
     nlp = spacy.load("fr_core_news_sm")
-    print('\033[0;34mDone!\033[0m')
 
+    # Loading stop words
+    stop_words_path = Path('/home/jarod/git/allocine-sentiment-analysis/data/json/stopwords.json')
+    with open(stop_words_path, 'r', encoding='utf8') as file:   
+        stop_words = json.load(file)
+    nlp.Defaults.stop_words = set(stop_words)
+    print('\033[0;34mDone!\033[0m')
+    
     # Clears first file to edit, in case of previous data registration
     open(out_folder / f'{basename}_{num_part}.ndjson', "w").close()
     
