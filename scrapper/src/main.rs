@@ -74,7 +74,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::builder().build()?;
     let resp = futures::stream::iter(movies)
     .map(|movie| {
-        let url = format!("https://www.allocine.fr/film/fichefilm_gen_cfilm={}.html", movie);
+        let url = format!(a", movie);
         let send_fut = client.get(&url).send();
         async move {
             let text = send_fut.await?.text().await?;

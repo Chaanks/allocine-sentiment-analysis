@@ -78,12 +78,13 @@ def tokenize_comment(comment, nlp_model=None ) -> list:
     tokens = re_hyperlink.sub(' ', comment.lower())
     tokens = re_punctuation.sub(' ', tokens)
     tokens = re_extra_space.sub(' ', tokens)
-    tokens = re_repetition.sub(r'\1\1', tokens)
+    #tokens = re_repetition.sub(r'\1\1', tokens)
     tokens = [ token for token in tokens.split() if len(token) > 1 ]
 
     # Filtering out stop words from the `tmp` list
+    
     if nlp_model is not None:
-        tokens = [ token for token in tokens if not nlp_model.vocab[token].is_stop ]
+        tokens = [ token for token in tokens if not token in nlp_model.Defaults.stop_words ]
 
     return [ { 'text': word } for word in tokens ]
 
@@ -92,7 +93,7 @@ def json_to_ndjson(
     json_file       : Path, 
     out_folder      : Path, 
     limit           : int  = 200_000, 
-    es_index        : str  = 'movie_db',
+    es_index        : str  = 'movie_db_sw',
     movie_additional: Path = None
 ):
     """
