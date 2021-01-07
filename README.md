@@ -1,4 +1,16 @@
-# Attentes
+# Analyse de sentiments
+Groupe | Date | Sujet | UE | UCE | Encadrants
+:---|:---|:---|:---|:---|:---
+Jarod Duret, Jonathan Heno | 14/01/2021 | Prédiction de notes de films | Innovations et recherche pour la société du numérique | Application d'innovation | Richard Dufour, Vincent Labatut, Mickaël Rouvier
+
+
+## Installation de l'environnement conda
+L'environnement utilisé pour la réalisation de ce projet peut-être généré via la commande :
+```shell
+conda env create -f environment.yml
+```
+
+## Attentes
 L'idée est de faire une analyse descriptive du corpus.
 
 Il y a pour moi une première partie ou on explique la tâche, puis le corpus. Et on donne des informations sous forme de tableau (train/dev/test) :
