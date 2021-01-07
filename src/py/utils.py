@@ -1,43 +1,37 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__author__ = ["Jarod Duret", "Jonathan Heno"]
+"""utils.py:
+    Utilitary functions used to parse and process the original raw dataset.
+"""
+
+__authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "0.1.0"
-__maintainer__ = ["Jarod Duret", "Jonathan Heno"]
-__email__ = [
-    "jarod.duret@alumni.univ-avignon.fr",
-    "jonathan.heno@alumni.univ-avignon.fr",
-]
+__version__ = "1.0.0"
+__maintainers__ = ["Jarod Duret", "Jonathan Heno"]
+__email__ = ["jarod.duret@alumni.univ-avignon.fr", "jonathan.heno@alumni.univ-avignon.fr"]
+__license__ = "MIT"
 
 
-import xml.etree.ElementTree
-import numpy
 import json
+import math
+import numpy
 import pathlib
 import re
 import shutil
-import math
 import spacy
+import xml.etree.ElementTree
 
-from tqdm import tqdm
 from pathlib import Path, PurePath
+from tqdm import tqdm
+
+import const
 
 
-REGEXES = [
-    lambda x: re.sub(r'http\S+', ' ', x),
-    lambda x: re.sub(r'[^\d|(a-z)|\U0001F600-\U0001F64F|!|.|#|@|è|é|à|ù|ô|ü|ë|ä|û|î|ê|â|ç\s]', ' ', x),
-    lambda x: re.sub(r'<br />', ' ', x),
-    lambda x: re.sub(r'[\(|\)]', ' ', x),
-    #lambda x: re.sub(r'(.+?)\1{2,}', r'\1\1\1', x),
-    lambda x: re.sub(r'\s+', ' ', x)
-]
-
-
-def filter_comment(comment: str, nlp=None, as_list: bool=False) -> str or list:
+def filter_comment(comment: str, nlp=None, as_list: bool = False) -> str or list:
     """
     Filters out a comment with the list of regular expressions given in 
-    `REGEXES`.
+    `const.REGEXES`.
 
     Parameters
     ----------
@@ -54,7 +48,7 @@ def filter_comment(comment: str, nlp=None, as_list: bool=False) -> str or list:
         string otherwise
     """
     comment = comment.lower()
-    for regex in REGEXES:
+    for regex in const.REGEXES:
         comment = regex(comment)
     comment.strip()
 
@@ -62,9 +56,9 @@ def filter_comment(comment: str, nlp=None, as_list: bool=False) -> str or list:
     tokens = [token for token in comment.split() if len(token) > 0]
 
     if nlp is not None:
-        tokens = [ token for token in tokens if not token in nlp.Defaults.stop_words ]
-    
-    return ' '.join(tokens) if not as_list else tokens
+        tokens = [token for token in tokens if not token in nlp.Defaults.stop_words]
+
+    return " ".join(tokens) if not as_list else tokens
 
 
 def xml_to_json(xml_file: Path, json_file: Path):
@@ -98,14 +92,14 @@ def xml_to_json(xml_file: Path, json_file: Path):
         "user_id": lambda x: str(x),
         "commentaire": lambda x: str(x),
         "movie": lambda x: {"id": str(x)},
-#         "note": lambda x: numpy.float(x.replace(",", ".")),
+        #         "note": lambda x: numpy.float(x.replace(",", ".")),
     }
 
     for idx, child in enumerate(root):
         comment = {tag: op(child.find(tag).text) for tag, op in tag_ops.items()}
         comments += [comment]
 
-    with open(json_file, 'w', encoding='utf8') as file:
+    with open(json_file, "w", encoding="utf8") as file:
         json.dump(comments, file, ensure_ascii=False)
 
 
@@ -131,19 +125,19 @@ def parse_metadata(metadata: dict) -> dict:
     """
     obj = {}
 
-    obj['title'] = metadata['title']
-    obj['category'] = metadata['category']
+    obj["title"] = metadata["title"]
+    obj["category"] = metadata["category"]
 
     is_users = False
 
-    for content in metadata['data']:
-        if content.strip().lower() == 'spectateurs':
+    for content in metadata["data"]:
+        if content.strip().lower() == "spectateurs":
             is_user = True
         else:
             try:
-                content = float(content.strip().replace(',', '.'))
+                content = float(content.strip().replace(",", "."))
                 if not math.isnan(content) and is_user:
-                    obj['avg_note'] = content
+                    obj["avg_note"] = content
                     break
             except ValueError:
                 continue
@@ -153,7 +147,7 @@ def json_to_ndjson(
     json_file: Path,
     out_folder: Path,
     limit: int = 200_000,
-    es_index: str = 'movie_db_sw',
+    es_index: str = "movie_db_sw",
     movie_additional: Path = None,
 ):
     """
@@ -180,64 +174,67 @@ def json_to_ndjson(
 
     # Creates folder given file's basename where all output files should be
     # saved an update the output path.
-    pathlib.Path(out_folder / f'{basename}').mkdir(parents=True, exist_ok=True)
-    out_folder = out_folder / f'{basename}'
+    pathlib.Path(out_folder / f"{basename}").mkdir(parents=True, exist_ok=True)
+    out_folder = out_folder / f"{basename}"
 
     if out_folder.is_dir():
         clear_dir(out_folder)
 
-    es_idx = {'index': {'_index': es_index}}
+    es_idx = {"index": {"_index": es_index}}
 
     # Loading raw json file
-    with open(json_file, 'r', encoding='utf8') as file:
+    with open(json_file, "r", encoding="utf8") as file:
         raw_dataset = json.load(file)
 
     # Loading complementary data from web scrapping
     if movie_additional is not None:
-        with open(movie_additional, 'r', encoding='utf8') as file:
+        with open(movie_additional, "r", encoding="utf8") as file:
             extra_info = json.load(file)
 
     # Tokenization and comments registration
     num_part = 0
     num_elts = len(raw_dataset)
-    num_digits = len(f'{num_elts:_d}')
+    num_digits = len(f"{num_elts:_d}")
 
     # Loading SpaCy model from tokenization utilities
     spacy.prefer_gpu()
-    nlp = spacy.load('fr_core_news_sm')
+    nlp = spacy.load("fr_core_news_sm")
 
     # Loading stop words
     stop_words_path = Path(
-        '/home/jarod/git/allocine-sentiment-analysis/data/json/stopwords.json'
+        "/home/jarod/git/allocine-sentiment-analysis/data/json/stopwords.json"
     )
-    with open(stop_words_path, 'r', encoding='utf8') as file:
+    with open(stop_words_path, "r", encoding="utf8") as file:
         stop_words = json.load(file)
     nlp.Defaults.stop_words = set(stop_words)
 
     # Clears first file to edit, in case of previous data registration
-    open(out_folder / f'{basename}_{num_part}.ndjson', 'w').close()
+    open(out_folder / f"{basename}_{num_part}.ndjson", "w").close()
 
     for idx, review in enumerate(raw_dataset):
-        review['lst_mots'] = [{'text': word} for word in filter_comment(review['commentaire'], nlp=nlp, as_list=True)]
-        review['num_chars'] = sum(len(token) for token in review['lst_mots'])
+        review["lst_mots"] = [
+            {"text": word}
+            for word in filter_comment(review["commentaire"], nlp=nlp, as_list=True)
+        ]
+        review["num_chars"] = sum(len(token) for token in review["lst_mots"])
 
         if extra_info is not None:
-            review['movie'].update(parse_metadata(extra_info[review['movie']['id']]))
+            review["movie"].update(parse_metadata(extra_info[review["movie"]["id"]]))
 
         if idx % limit == limit - 1:
             # The maximum number of entries has been reached, we need to
             # register the next comments to a new file
             num_part += 1
-            open(out_folder / f'{basename}_{num_part}.ndjson', 'w').close()
+            open(out_folder / f"{basename}_{num_part}.ndjson", "w").close()
 
         # Registers data into the current `.ndjson` output file
-        with open(out_folder / f'{basename}_{num_part}.ndjson', 'a+') as file:
-            file.write(f'{json.dumps(es_idx, ensure_ascii=False)}\n')
-            file.write(f'{json.dumps(review, ensure_ascii=False)}\n')
+        with open(out_folder / f"{basename}_{num_part}.ndjson", "a+") as file:
+            file.write(f"{json.dumps(es_idx, ensure_ascii=False)}\n")
+            file.write(f"{json.dumps(review, ensure_ascii=False)}\n")
 
 
 def clear_dir(folder: Path):
-    for path in folder.glob('**/*'):
+    for path in folder.glob("**/*"):
         if path.is_file():
             path.unlink()
         elif path.is_dir():
