@@ -7,7 +7,10 @@ __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
 __version__ = "1.0.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
-__email__ = ["jarod.duret@alumni.univ-avignon.fr", "jonathan.heno@alumni.univ-avignon.fr"]
+__email__ = [
+    "jarod.duret@alumni.univ-avignon.fr",
+    "jonathan.heno@alumni.univ-avignon.fr",
+]
 __license__ = "MIT"
 
 
@@ -23,7 +26,7 @@ import const
 import parser
 
 from loguru import logger
-from models.cnn import CovNet1D
+from model.cnn_baseline import CNNBaseline
 from pathlib import Path
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
@@ -40,8 +43,8 @@ if __name__ == "__main__":
     # Load pre-trained model
     vl_path = mod_dir / const.VLAYER_OUTPUT_FILE
     vl = pickle.load(open(vl_path, "rb"))
-    vectorize_layer = TextVectorization.from_config(vl["config"])
-    vectorize_layer.set_weights(vl["weights"])
+    vlayer = TextVectorization.from_config(vl["config"])
+    vlayer.set_weights(vl["weights"])
     # [BUG KERAS] You have to call `adapt` with some dummy data
     # new_v.adapt(tf.data.Dataset.from_tensor_slices(["xyz"]))
 
@@ -53,7 +56,7 @@ if __name__ == "__main__":
     # A string input
     inputs = tf.keras.Input(shape=(1,), dtype="string")
     # Turn strings into vocab indices
-    indices = vectorize_layer(inputs)
+    indices = vlayer(inputs)
     # Turn vocab indices into predictions
     outputs = model(indices)
 
