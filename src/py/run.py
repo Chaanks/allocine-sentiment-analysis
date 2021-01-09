@@ -5,7 +5,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.0.0"
+__version__ = "1.5.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -21,11 +21,11 @@ import tensorflow as tf
 import yaml
 
 import const
+import model.conv_mod
 import parser
 import utils
 
 from loguru import logger
-from model.cnn_baseline import CNNBaseline
 from pathlib import Path
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
@@ -104,9 +104,9 @@ if __name__ == "__main__":
     dev_ds = dev_ds.cache().prefetch(buffer_size=10)
 
     # Fit the model using the train and test datasets.
-    model = CNNBaseline(len(const.IDX_TO_LBL), **cfg["model"])
+    model = conv_mod.ConvMod(len(const.IDX_TO_LBL), **{key: value for (key, value) in cfg["model"] if key in ['out_dim', 'voc_len', 'emb_dim', 'layers']})
     model.compile(
-        loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"]
+        loss=cfg['model']['loss'], optimizer=cfg['model']['optimizer'], metrics=cfg['model']['metrics']
     )
     model.fit(train_ds, validation_data=dev_ds, epochs=cfg["exp"]["epochs"])
 
@@ -115,6 +115,6 @@ if __name__ == "__main__":
         yaml.safe_dump(cfg, file, indent=2)
     model.save(out / "model")
     pickle.dump(
-        {"cfg": vlayer.get_config(), "weights": vlayer.get_weights()},
+        {"cfg": vlayer.get_config(), "w": vlayer.get_weights()},
         open(out / const.VLAYER_OUTPUT_FILE, "wb"),
     )

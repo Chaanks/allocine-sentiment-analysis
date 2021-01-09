@@ -5,7 +5,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.0.0"
+__version__ = "1.5.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -82,3 +82,7 @@ ES_IDX_WITHOUT_ES_OUTPUT = f"\033[1;33mGave ES index without {ES_FORMAT}.\033[0m
 TOO_MANY_OPTIONS_PROVIDED_FOR_JSON_OUTPUT = (
     f"\033[1;33mToo many arguments given for {JSON_FORMAT} output.\033[0m"
 )
+UNKNOWN_LAYER_TYPE = lambda m: f"\033[1;33mUnknown layer for {m}.\033[0m"
+NO_STD_FOR_JSON_FORMAT = f"""\033[1;33m\
+Review standardization is not an available option for {JSON_FORMAT} output.\
+\033[0m"""

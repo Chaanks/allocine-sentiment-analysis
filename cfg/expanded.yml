@@ -1,0 +1,42 @@
+exp: 
+  name: 'baseline'
+  desc: 'Baseline ConvNet1D network.'
+  epochs: 5
+
+model:
+  batch_size: 256
+  voc_len: 20_000
+  emb_dim: 128
+  seq_len: 10_000
+  dropout: 0.5
+  layers:
+    - dropout: 0.5
+    # Defining 5 parallel convolutionnal networks
+    - conv1d:
+      filters: 64
+      kernel_size: 2
+      strides: 1
+    - conv1d:
+      filters: 64
+      kernel_size: 3
+      strides: 1
+    - conv1d:
+      filters: 64
+      kernel_size: 4
+      strides: 1
+    - conv1d:
+      filters: 64
+      kernel_size: 5
+      strides: 1
+    - conv1d:
+      filters: 64
+      kernel_size: 6
+      strides: 1
+    - dropout: 0.5
+    - 'global_max_pooling'
+    - 'flatten' # outputs aggregation
+    - dense: 256
+  loss: 'categorical_crossentropy'
+  optimizer: 'adam'
+  metrics: 
+    - 'accuracy'
