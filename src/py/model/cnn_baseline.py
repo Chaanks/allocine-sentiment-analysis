@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""cnn_baseline.py: Defines a better version of a CNN for our sentiment analysis application."""
+"""cnn_baseline.py: 
+    Baseline CNN architecture for our sentiment analysis application.
+    For baseline implementation credits to:
+        * https://missinglink.ai/guides/keras/keras-conv1d-working-1d-convolutional-neural-networks-keras/
+        * https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/
+"""
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.0.0"
+__version__ = "1.5.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",

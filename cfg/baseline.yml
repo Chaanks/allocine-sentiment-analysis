@@ -1,6 +1,6 @@
 exp: 
   name: 'baseline'
-  desc: ''
+  desc: 'Baseline ConvNet1D network.'
   epochs: 5
 
 model:
@@ -8,11 +8,17 @@ model:
   voc_len: 20_000
   emb_dim: 128
   seq_len: 10_000
-  dropout: 0.5
-  strides: 3
-  frames: 
-    - 2
-    - 3
-    - 4
-    - 5
-    - 6
+  layers:
+    - dropout: 0.5
+     - conv1d:
+      filters: 128
+      kernel_size: 7
+      strides: 3
+    - conv1d:
+      filters: 128
+      kernel_size: 7
+      strides: 3
+    - dropout: 0.5
+    - 'global_max_pooling'
+    - 'flatten'
+    - dense: 128

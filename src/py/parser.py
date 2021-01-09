@@ -5,7 +5,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.0.0"
+__version__ = "1.5.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -108,7 +108,7 @@ def parse_args(mode: str) -> argparse.Namespace:
             "-std",
             "--standardize",
             action="store_true",
-            help="Review content standardization.",
+            help=f"[{const.ES_FORMAT.upper()}][{const.TRIALS_FORMAT.upper()}][{const.TRAIN_FORMAT.upper()}] Review content standardization.",
         )
 
     parser.add_argument(
@@ -153,3 +153,5 @@ def check_args(mode: str, ns: argparse.Namespace):
             raise ValueError(const.ES_IDX_WITHOUT_ES_OUTPUT)
         if ns.out_format == "json" and (ns.extra or ns.stopwords or ns.standardize):
             raise ValueError(const.TOO_MANY_OPTIONS_PROVIDED_FOR_JSON_OUTPUT)
+        if ns.standardize and ns.out_format == const.JSON_FORMAT:
+            raise ValueError(const.NO_STD_FOR_JSON_FORMAT)

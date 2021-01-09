@@ -5,7 +5,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.0.0"
+__version__ = "1.5.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -238,7 +238,7 @@ def gen_trials(
 
     for review in tqdm(ds):
         # Filters and standardize review's content
-        filtered = utils.filter_comment(review["commentaire"], nlp)
+        filtered = utils.filter_comment(review["commentaire"], nlp=nlp, std=std)
 
         # If the filtered content is empty, we notify the user and setup the
         # entry of this trial back to the original comment
