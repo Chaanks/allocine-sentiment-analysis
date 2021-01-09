@@ -66,12 +66,12 @@ $ python3 src/py/gen.py -if raw -d data/xml/test.xml -of score -sw data/json/sto
 
 ### Training a model
 ```shell
-usage: run.py [-h] [-cfg CONFIG] [-t TRAIN] [-d DEV] OUT_DIR
+usage: run.py [-h] -cfg CONFIG -t TRAIN -d DEV out
 
 Trains a neural network on allocine database given a configuration file.
 
 positional arguments:
-  OUT_DIR               Path to output directory.
+  out                   Path to output directory.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -84,12 +84,12 @@ optional arguments:
 
 ### Evaluating a pre-trained model
 ```shell
-usage: score.py [-h] [-m MODEL] [-t TRIALS] OUT_DIR
+usage: score.py [-h] -m MODEL -t TRIALS out
 
 Scores a trained model on a set of trials.
 
 positional arguments:
-  OUT_DIR               Path to output directory.
+  out                   Path to output directory.
 
 optional arguments:
   -h, --help            show this help message and exit

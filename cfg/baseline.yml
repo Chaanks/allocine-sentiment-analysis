@@ -2,23 +2,29 @@ exp:
   name: 'baseline'
   desc: 'Baseline ConvNet1D network.'
   epochs: 5
+  batch_size: 256
+  
+corpus:
+  voc_len: 20_000
+  seq_len: 10_000
+  emb_dim: 128
 
 model:
-  batch_size: 256
-  voc_len: 20_000
-  emb_dim: 128
-  seq_len: 10_000
   layers:
     - dropout: 0.5
-     - conv1d:
-      filters: 128
-      kernel_size: 7
-      strides: 3
     - conv1d:
-      filters: 128
-      kernel_size: 7
-      strides: 3
+        filters: 128
+        kernel_size: 7
+        strides: 3
+    - conv1d:
+        filters: 128
+        kernel_size: 7
+        strides: 3
     - dropout: 0.5
     - 'global_max_pooling'
     - 'flatten'
     - dense: 128
+  loss: 'categorical_crossentropy'
+  optimizer: 'adam'
+  metrics: 
+    - 'accuracy'

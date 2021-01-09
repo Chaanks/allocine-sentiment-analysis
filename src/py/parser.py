@@ -58,15 +58,15 @@ def parse_args(mode: str) -> argparse.Namespace:
 
     if mode == const.TRAIN_MODE:
         parser.add_argument(
-            "-cfg", "--config", type=str, help="Path to model config file."
+            "-cfg", "--config", type=str, help="Path to model config file.", required=True
         )
-        parser.add_argument("-t", "--train", type=str, help="Path to training set.")
-        parser.add_argument("-d", "--dev", type=str, help="Path to validation set.")
+        parser.add_argument("-t", "--train", type=str, help="Path to training set.", required=True)
+        parser.add_argument("-d", "--dev", type=str, help="Path to validation set.", required=True)
     elif mode == const.SCORE_MODE:
         parser.add_argument(
-            "-m", "--model", type=str, help="Path to directory of the trained model."
+            "-m", "--model", type=str, help="Path to directory of the trained model.", required=True
         )
-        parser.add_argument("-t", "--trials", type=str, help="Path to trials.")
+        parser.add_argument("-t", "--trials", type=str, help="Path to trials.", required=True)
     elif mode == const.GEN_MODE:
         parser.add_argument(
             "-d",
