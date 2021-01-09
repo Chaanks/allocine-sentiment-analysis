@@ -65,7 +65,11 @@ def xml_to_json(xml_file: pathlib.Path, json_file: pathlib.Path):
     }
 
     for idx, child in enumerate(tqdm(root)):
-        comment = {tag: op(child.find(tag).text) for tag, op in tag_ops.items() if child.find(tag) != None}
+        comment = {
+            tag: op(child.find(tag).text)
+            for tag, op in tag_ops.items()
+            if child.find(tag) != None
+        }
         comments += [comment]
 
     with open(json_file, "w", encoding="utf8") as file:
@@ -78,7 +82,8 @@ def json_to_ndjson(
     limit: int = 200_000,
     es_index: str = "movie_db",
     movie_extra: pathlib.Path = None,
-    nlp = None
+    std: bool = True,
+    nlp=None,
 ):
     """
     Get the raw list of comments form a `.json` source, tokenize the 
@@ -100,6 +105,8 @@ def json_to_ndjson(
         Maximum number of comments per file in the output pipeline.
     es_index: str, optional (default: "movie_db")
         Name of the Elastic Search database.
+    std: bool (default: True)
+        If True this method will standardize the textual content with preset.
     nlp: NLP SpaCy model (default: None)
         NLP model to load while parsing the raw dataset. This extra utility 
         helps us to filter out stop words during reviews' preprocessing.
@@ -134,7 +141,7 @@ def json_to_ndjson(
         review["lst_mots"] = [
             {"text": word}
             for word in utils.filter_comment(
-                review["commentaire"], nlp=nlp, as_list=True
+                review["commentaire"], nlp=nlp, std=std, as_list=True
             )
         ]
         review["num_chars"] = sum(len(token) for token in review["lst_mots"])
@@ -156,7 +163,9 @@ def json_to_ndjson(
             file.write(f"{json.dumps(review, ensure_ascii=False)}\n")
 
 
-def gen_dataset(ds_file: pathlib.Path, out_dir: pathlib.Path, nlp=None):
+def gen_dataset(
+    ds_file: pathlib.Path, out_dir: pathlib.Path, std: bool = True, nlp=None
+):
     """
     Extracts a dataset from a `.json` formatted dataset and stores it under a 
     keras readable architecture.
@@ -168,6 +177,8 @@ def gen_dataset(ds_file: pathlib.Path, out_dir: pathlib.Path, nlp=None):
     out_dir: pathlib.Path
         Output directory that should contain the whole dataset architecture
         in conformity with keras standards.
+    std: bool (default: True)
+        If True this method will standardize the textual content with preset.
     nlp: NLP SpaCy model (default: None)
         NLP model to load while parsing the raw dataset. This extra utility 
         helps us to filter out stop words during reviews' preprocessing.
@@ -183,7 +194,7 @@ def gen_dataset(ds_file: pathlib.Path, out_dir: pathlib.Path, nlp=None):
     # Write files
     for review in tqdm(ds):
         # Filters and standardize review's content
-        filtered = utils.filter_comment(review["commentaire"], nlp=nlp)
+        filtered = utils.filter_comment(review["commentaire"], std=std, nlp=nlp)
         if len(filtered) == 0:
             logger.warning(f"Review {review['review_id']} filtered out")
             continue
@@ -199,7 +210,9 @@ def gen_dataset(ds_file: pathlib.Path, out_dir: pathlib.Path, nlp=None):
             file.write(filtered)
 
 
-def gen_trials(ds_file: pathlib.Path, out_dir: pathlib.Path, nlp=None):
+def gen_trials(
+    ds_file: pathlib.Path, out_dir: pathlib.Path, std: bool = True, nlp=None
+):
     """
     Extracts a dataset from a `.json` formatted dataset and stores it under a 
     keras readable architecture.
@@ -211,6 +224,8 @@ def gen_trials(ds_file: pathlib.Path, out_dir: pathlib.Path, nlp=None):
     out_dir: pathlib.Path
         Output directory that should contain the whole dataset architecture
         in conformity with keras standards.
+    std: bool (default: True)
+        If True this method will standardize the textual content with preset.
     nlp: NLP SpaCy model (default: None)
         NLP model to load while parsing the raw dataset. This extra utility 
         helps us to filter out stop words during reviews' preprocessing.
@@ -249,7 +264,7 @@ if __name__ == "__main__":
             nlp.Defaults.stop_words = set(json.load(file))
     else:
         nlp = None
-    
+
     out = pathlib.Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -259,14 +274,22 @@ if __name__ == "__main__":
 
             json_file = out / f"{p.stem}.json"
             xml_to_json(p, json_file)
-            
+
             if args.out_format == const.ES_FORMAT:
-                json_to_ndjson(json_file, out, limit=10_000, movie_extra=pathlib.Path(args.extra) if args.extra else None, nlp=nlp)
+                json_to_ndjson(
+                    json_file,
+                    out,
+                    limit=10_000,
+                    movie_extra=pathlib.Path(args.extra) if args.extra else None,
+                    es_idx=args.es_idx,
+                    std=args.standardization,
+                    nlp=nlp,
+                )
             elif args.out_format == const.TRAIN_FORMAT:
-                gen_dataset(json_file, out, nlp=nlp)
+                gen_dataset(json_file, out, nlp=nlp, std=args.standardization)
             elif args.out_format == const.TRIALS_FORMAT:
-                gen_trials(json_file, out, nlp=nlp)
-            
+                gen_trials(json_file, out, nlp=nlp, std=args.standardization)
+
             if args.out_format != const.JSON_FORMAT:
                 json_file.unlink()
     elif args.in_format == const.JSON_FORMAT:
@@ -274,8 +297,15 @@ if __name__ == "__main__":
             json_file = pathlib.Path(path)
 
             if args.out_format == const.ES_FORMAT:
-                json_to_ndjson(json_file, out, limit=10_000, movie_extra=pathlib.Path(args.extra) if args.extra else None, nlp=nlp)
+                json_to_ndjson(
+                    json_file,
+                    out,
+                    limit=10_000,
+                    movie_extra=pathlib.Path(args.extra) if args.extra else None,
+                    std=args.standardization,
+                    nlp=nlp,
+                )
             elif args.out_format == const.TRAIN_FORMAT:
-                gen_dataset(json_file, json, out, nlp=nlp)
+                gen_dataset(json_file, json, out, std=args.standardization, nlp=nlp)
             elif args.out_format == const.TRIALS_FORMAT:
-                gen_trials(json_file, out, nlp=nlp)
+                gen_trials(json_file, out, std=args.standardization, nlp=nlp)

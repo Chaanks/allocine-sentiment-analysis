@@ -27,7 +27,9 @@ from tqdm import tqdm
 import const
 
 
-def filter_comment(comment: str, nlp=None, as_list: bool = False) -> str or list:
+def filter_comment(
+    comment: str, nlp=None, std: bool = True, as_list: bool = False
+) -> str or list:
     """
     Filters out a comment with the list of regular expressions given in 
     `const.REGEXES`.
@@ -36,12 +38,13 @@ def filter_comment(comment: str, nlp=None, as_list: bool = False) -> str or list
     ----------
     comment: str
         Content to filter.
-
     nlp: NLP SpaCy model (default: None)
         NLP model to load while parsing the raw dataset. This extra utility 
         helps us to filter out stop words during reviews' preprocessing.
-    
-    as_list: bool
+    std: bool (default: True)
+        If True this method will standardize the textual content with preset.
+        regexes.
+    as_list: bool (default: False)
         If the method should retourn a list of tokens or as a simple string.
 
     Returns
@@ -51,9 +54,11 @@ def filter_comment(comment: str, nlp=None, as_list: bool = False) -> str or list
         string otherwise.
     """
     comment = comment.lower()
-    for regex in const.REGEXES:
-        comment = regex(comment)
-    comment.strip()
+
+    if std:
+        for regex in const.REGEXES:
+            comment = regex(comment)
+        comment.strip()
 
     # Filtering out stop words from the `tmp` list
     tokens = [token for token in comment.split() if len(token) > 0]

@@ -68,8 +68,17 @@ VLAYER_OUTPUT_FILE = "tv_layer.pkl"
 UNKNOWN_RUNNING_MODE = (
     lambda mode: f"\033[1;33mUnknown {mode} mode ({{'run'|'score'|'gen'}} expected).\033[0m"
 )
-NO_RUNNING_MODE = "\033[1;33mNo running mode given ({'run'|'score'|'gen'} expected).\033[0m"
-OUT_IS_NOT_DIRECTORY = lambda path: f"\033[1;33mOutput path {path} is not a directory.\033[0m"
+NO_RUNNING_MODE = (
+    "\033[1;33mNo running mode given ({'run'|'score'|'gen'} expected).\033[0m"
+)
+OUT_IS_NOT_DIRECTORY = (
+    lambda path: f"\033[1;33mOutput path {path} is not a directory.\033[0m"
+)
 SAME_IO_FORMAT = "\033[1;33mSame input and output format given.\033[0m"
-EXTRA_WITHOUT_ES = f"\033[1;33mGave path to extra movie metadata set without {ES_FORMAT}.\033[0m"
-TOO_MANY_OPTIONS_PROVIDED_FOR_JSON_OUTPUT = f"\033[1;33mToo many arguments given for {JSON_FORMAT} output.\033[0m"
+EXTRA_WITHOUT_ES_OUTPUT = (
+    f"\033[1;33mGave path to extra movie metadata set without {ES_FORMAT}.\033[0m"
+)
+ES_IDX_WITHOUT_ES_OUTPUT = f"\033[1;33mGave ES index without {ES_FORMAT}.\033[0m"
+TOO_MANY_OPTIONS_PROVIDED_FOR_JSON_OUTPUT = (
+    f"\033[1;33mToo many arguments given for {JSON_FORMAT} output.\033[0m"
+)

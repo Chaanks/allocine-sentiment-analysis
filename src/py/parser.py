@@ -75,16 +75,16 @@ def parse_args(mode: str) -> argparse.Namespace:
             metavar="DSFILE",
             type=str,
             help="Path to dataset file(s).",
-            required=True
+            required=True,
         )
-        
+
         parser.add_argument(
             "-if",
             "--in_format",
             type=str,
             help="Source file format.",
             choices=const.IN_FORMATS,
-            required=True
+            required=True,
         )
         parser.add_argument(
             "-of",
@@ -92,31 +92,22 @@ def parse_args(mode: str) -> argparse.Namespace:
             type=str,
             help="Output file format.",
             choices=const.OUT_FORMATS,
-            required=True
+            required=True,
         )
 
         parser.add_argument(
-            "-sw",
-            "--stopwords",
-            type=str,
-            help="Path to stop words file.",
+            "-sw", "--stopwords", type=str, help="Path to stop words file.",
         )
         parser.add_argument(
-            "-e",
-            "--extra",
-            type=str,
-            help="[ES] Path to movie metadata set.",
+            "-e", "--extra", type=str, help="[ES] Path to movie metadata set.",
         )
         parser.add_argument(
-            "-ei",
-            "--es_idx",
-            type=str,
-            help="[ES] Name of the ES database.",
+            "-ei", "--es_idx", type=str, help="[ES] Name of the ES database.",
         )
         parser.add_argument(
             "-std",
             "--standardize",
-            action='store_true',
+            action="store_true",
             help="Review content standardization.",
         )
 
@@ -157,6 +148,8 @@ def check_args(mode: str, ns: argparse.Namespace):
         if ns.in_format == ns.out_format:
             raise ValueError(const.SAME_IO_FORMAT)
         if ns.extra and ns.out_format != const.ES_FORMAT:
-            raise ValueError(const.EXTRA_WITHOUT_ES)
+            raise ValueError(const.EXTRA_WITHOUT_ES_OUTPUT)
+        if ns.es_idx and ns.out_format != const.ES_FORMAT:
+            raise ValueError(const.ES_IDX_WITHOUT_ES_OUTPUT)
         if ns.out_format == "json" and (ns.extra or ns.stopwords or ns.standardize):
             raise ValueError(const.TOO_MANY_OPTIONS_PROVIDED_FOR_JSON_OUTPUT)
