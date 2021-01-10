@@ -38,22 +38,18 @@ def vectorize(text: str, label: float, vlayer: TextVectorization):
 
     Parameters
     ----------
-        text: str
+        text: tensorflow.python.framework.ops.Tensor
             Review to vectorize.
         label: tensorflow.python.framework.ops.Tensor
             Rating linked with this text.
-        vlayer: TextVectorization
+        vlayer: tensorflow.python.keras.layers.preprocessing.text_vectorization.TextVectorization
             Text vectorization model
     Returns
     -------
         (tensor, float): The corresponding floating tensor with its rating.
     """
-    print(type(label))
-    print(type(text))
-    print(type(vlayer))
-    print('---')
     text = tf.expand_dims(text, -1)
-    return vlayer(text), label  # ?????
+    return vlayer(text), label
 
 
 if __name__ == "__main__":
@@ -67,6 +63,8 @@ if __name__ == "__main__":
     out = Path(args.out)
     if out.is_dir():
         utils.clear_dir(out)
+    else:
+        out.mkdir(parents=True, exist_ok=True)
 
     train = Path(args.train)
     dev = Path(args.dev)

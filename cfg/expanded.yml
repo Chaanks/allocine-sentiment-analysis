@@ -2,11 +2,11 @@ exp:
   name: 'ConvNet5P'
   desc: '5 parallel convolutional layers aggregated with a DNN before passing throught the output layer'
   epochs: 5
-  batch_size: 256
+  batch_size: 512
 
 corpus:
   voc_len: 20_000
-  seq_len: 10_000
+  seq_len: 1_000
   emb_dim: 128
 
 model:
