@@ -16,13 +16,13 @@ from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 import string
 import pickle
 import pandas as pd
+from tqdm import tqdm
 from loguru import logger
 
 from models.cnn import CovNet1D
 
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]=""
 
-BATCH_SIZE = 128
 max_features = 20000
 embedding_dim = 128
 sequence_length = 2000
@@ -75,11 +75,14 @@ if __name__ == '__main__':
     
     preds = []
     
-    for index, row in df.iterrows():
+    for _, row in tqdm(df.iterrows()):
         text = tf.expand_dims(row['commentaire'], -1)
         result = end_to_end_model.predict(text)
-        idx = IDX2LABEL[tf.math.argmax(result)]
-
-    text = tf.expand_dims('mauvais film', -1)
-    result = end_to_end_model.predict(text)
-    print(result)
+        m = int(tf.math.argmax(result[0]))
+        idx = IDX2LABEL[m]
+        preds.append((row['review_id'], idx))
+        break
+    
+    with open('../data/allocine_filtered/test/test_scores.txt', 'w') as file:
+        for review_id, pred in preds: 
+            file.write(f'{review_id} {pred}\n')
