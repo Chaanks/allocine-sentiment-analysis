@@ -5,9 +5,25 @@ Jarod Duret, Jonathan Heno | 14/01/2021 | Prédiction de notes de films | Innova
 
 
 ## Installation
+### conda
 The conda environment used for this project can be generated as follows:
 ```shell
-conda env create -f environment.yml
+$ conda env create -f environment.yml
+```
+
+### pip
+You can also install project's dependencies with `pip` with the following command:
+```shell
+$ pip install -r requirements.txt
+```
+Also, make sure to install the appropriate **cudatoolkit** version for GPU usage (`cudatoolkit 11.0.221` used).
+
+
+## Creation
+Commands used for generating the python configuration:
+```shell
+$ conda env export > environment.yml
+$ pip freeze > requirements.txt
 ```
 
 ## Usage
@@ -105,6 +121,9 @@ optional arguments:
 - [x] Config file management
 - [x] Data generation
 - [ ] CNN improvement (5 convolutions instead of 2)
+  - [ ] Functional testing
+  - [ ] Fix
+  - [ ] Implementation
 - [ ] User embedding generation
 - [ ] Director one hot encoding on all corpus (train, dev and test)
 - [ ] Genre multi-encoding for all films (train, dev and test)

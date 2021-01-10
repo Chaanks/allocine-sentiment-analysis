@@ -14,14 +14,12 @@ __email__ = [
 __license__ = "MIT"
 
 
-import tensorflow as tf
+import tensorflow
 
 import const
 
-from tensorflow.keras import layers, models
 
-
-class ConvMod(tf.keras.Model):
+class ConvMod(tensorflow.keras.Model):
     def __init__(
         self,
         out_dim: int,
@@ -31,34 +29,30 @@ class ConvMod(tf.keras.Model):
     ):
         super(ConvMod, self).__init__()
 
-        self.model = models.Sequential()
+        self.embedding = tensorflow.keras.layers.Embedding(voc_len, emb_dim)
 
-        for layer in layer_series:
+        self.model = tensorflow.keras.models.Sequential()
+
+        for layer in layers:
             if 'dropout' in layer:
-                self.model.add(layers.Dropout(layer['dropout']))
+                self.model.add(tensorflow.keras.layers.Dropout(layer['dropout']))
             elif 'conv1d' in layer:
                 conv = layer['conv1d']
-                self.model.add(layers.Conv1D(conv['filters'], conv['kernel'], strides=conv['strides'], padding='valid', activation="relu"))
+                self.model.add(tensorflow.keras.layers.Conv1D(conv['filters'], conv['kernel_size'], strides=conv['strides'], padding='valid', activation="relu"))
             elif 'dense' in layer:
-                self.model.add(layers.Dense(layer['dense']), activation='relu')
+                self.model.add(tensorflow.keras.layers.Dense(layer['dense'], activation='relu'))
             elif isinstance(layer, str):
                 if layer == 'global_max_pooling':
-                    self.model.add(layers.GlobalMaxPooling1D())
+                    self.model.add(tensorflow.keras.layers.GlobalMaxPooling1D())
                 elif layer == 'flatten':
-                    self.model.add(layers.Flatten())
+                    self.model.add(tensorflow.keras.layers.Flatten())
                 else:
                     raise ValueError(const.UNKNOWN_LAYER_TYPE(layer))
         
-        self.model.add(layers.Dense(out_dim, activation="softmax", name="predictions"))
+        # Output layer
+        self.model.add(tensorflow.keras.layers.Dense(out_dim, activation="softmax", name="predictions"))
 
 
     def call(self, inputs, training=False):
-        x = self.emdedding(inputs)
-
-        for layer in self.model:
-            if isinstance(layer, layers.Dropout):
-                x = layer(x, training=training)
-            else:
-                x = layer(x)
-        
-        return x
+        x = self.embedding(inputs)
+        return self.model(x, training=training)
