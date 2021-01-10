@@ -156,10 +156,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let users_path = Path::new("../data/json/users.json");
     let users_str = read_to_string(users_path).expect("file not found");
     let users : Vec<String> = serde_json::from_str(&users_str).expect("error while reading json");
-    let n = 50_000;
-    
+    let nn = users.len();
+    let n = 100_000;
+
     let client = Client::builder().build()?;
-    let resp = futures::stream::iter(users[0..n].to_vec())
+    let resp = futures::stream::iter(users[n..nn].to_vec())
     .map(|user| {
         let url = format!("https://www.allocine.fr/membre-{}", user);
 
@@ -189,7 +190,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(e) => println!("failed, {}", e),
     };
 
-    serde_json::to_writer(&File::create("users_additional_1.json")?, &map)?;
+    serde_json::to_writer(&File::create("users_additional_3.json")?, &map)?;
 
     Ok(())
 }
