@@ -70,7 +70,7 @@ def parse_args(mode: str) -> argparse.Namespace:
             "-t", "--train", type=str, help="Path to training set.", required=True
         )
         parser.add_argument(
-            "-d", "--dev", type=str, help="Path to validation set.", required=True
+            "-d", "--dev", type=str, help="Path to validation set."
         )
     elif mode == const.SCORE_MODE:
         parser.add_argument(

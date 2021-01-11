@@ -73,22 +73,6 @@ if __name__ == "__main__":
 
     # tensorflow.config.experimental.list_physical_devices('CPU'))
 
-    # Retrieving dataset
-    raw_train_ds = tensorflow.keras.preprocessing.text_dataset_from_directory(
-        train, label_mode="categorical", batch_size=cfg["exp"]["batch_size"]
-    )
-    raw_dev_ds = tensorflow.keras.preprocessing.text_dataset_from_directory(
-        dev, label_mode="categorical", batch_size=cfg["exp"]["batch_size"]
-    )
-    logger.info(
-        "Number of batches in train set: %d"
-        % tensorflow.data.experimental.cardinality(raw_train_ds)
-    )
-    logger.info(
-        "Number of batches in dev set: %d"
-        % tensorflow.data.experimental.cardinality(raw_dev_ds)
-    )
-
     # Instanciating word embedding model
     vlayer = TextVectorization(
         standardize=None,
@@ -96,16 +80,32 @@ if __name__ == "__main__":
         output_mode="int",
         output_sequence_length=cfg["corpus"]["seq_len"],
     )
+
+    # Retrieving datasets
+    raw_train_ds = tensorflow.keras.preprocessing.text_dataset_from_directory(
+        train, label_mode="categorical", batch_size=cfg["exp"]["batch_size"]
+    )
+    logger.info(
+        "Number of batches in train set: %d"
+        % tensorflow.data.experimental.cardinality(raw_train_ds)
+    )
     reviews = raw_train_ds.map(lambda x, y: x)
     vlayer.adapt(reviews)
-
     # Generating embeddings
     train_ds = raw_train_ds.map(lambda rev, lbl: vectorize(rev, lbl, vlayer))
-    dev_ds = raw_dev_ds.map(lambda rev, lbl: vectorize(rev, lbl, vlayer))
-
     # Do async prefetching / buffering of the data for best performance on GPU
     train_ds = train_ds.cache().prefetch(buffer_size=10)
-    dev_ds = dev_ds.cache().prefetch(buffer_size=10)
+
+    if args.dev:
+        raw_dev_ds = tensorflow.keras.preprocessing.text_dataset_from_directory(
+            dev, label_mode="categorical", batch_size=cfg["exp"]["batch_size"]
+        )
+        logger.info(
+            "Number of batches in dev set: %d"
+            % tensorflow.data.experimental.cardinality(raw_dev_ds)
+        )
+        dev_ds = raw_dev_ds.map(lambda rev, lbl: vectorize(rev, lbl, vlayer))
+        dev_ds = dev_ds.cache().prefetch(buffer_size=10)
 
     # Fit the model using the train and test datasets.
     model = conv1dmod.Conv1DMod(
@@ -124,12 +124,19 @@ if __name__ == "__main__":
         out / const.TRAIN_LOG_OUTPUT_FILE, separator="\t"
     )
 
-    model.fit(
-        train_ds,
-        validation_data=dev_ds,
-        epochs=cfg["exp"]["epochs"],
-        callbacks=[csv_logger],
-    )
+    if args.dev:
+        model.fit(
+            train_ds,
+            validation_data=dev_ds,
+            epochs=cfg["exp"]["epochs"],
+            callbacks=[csv_logger],
+        )
+    else:
+        model.fit(
+            train_ds,
+            epochs=cfg["exp"]["epochs"],
+            callbacks=[csv_logger],
+        )
 
     # Save configuration, model and embeddings in `out/` folder
     with open(out / const.CFG_OUTPUT_FILE, "w") as file:
