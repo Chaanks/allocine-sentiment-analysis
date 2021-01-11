@@ -36,20 +36,20 @@ def filter_comment(
 
     Parameters
     ----------
-    comment: str
+    comment (str):
         Content to filter.
-    nlp: NLP SpaCy model (default: None)
+    nlp (spacy.lang.fr, default: None):
         NLP model to load while parsing the raw dataset. This extra utility 
         helps us to filter out stop words during reviews' preprocessing.
-    std: bool (default: True)
+    std (bool, default: True):
         If True this method will standardize the textual content with preset.
         regexes.
-    as_list: bool (default: False)
+    as_list (bool, default: False):
         If the method should retourn a list of tokens or as a simple string.
 
     Returns
     -------
-    str or list(str)
+    (str or list(str)):
         The filtered comment as a list of tokens if `as_list` is `True`, as a 
         string otherwise.
     """
@@ -76,12 +76,12 @@ def parse_metadata(metadata: dict) -> dict:
 
     Parameter
     ---------
-    metadata: dict
+    metadata (dict):
         Film's metadata scrapped from allocine.fr
 
     Returns
     -------
-    dict
+    (dict):
         The parsed metadata as an objet with fields:
         {
             'title': str,

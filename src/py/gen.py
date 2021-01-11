@@ -47,9 +47,9 @@ def xml_to_json(xml_file: pathlib.Path, json_file: pathlib.Path):
     
     Parameters
     ----------
-    xml_file: pathlib.Path
+    xml_file (pathlib.Path):
         Path to `.xml` file to parse.
-    json_file: pathlib.Path
+    json_file (pathlib.Path):
         Path to `.json` file to write.
     """
     tree = xml.etree.ElementTree.parse(xml_file)
@@ -93,21 +93,21 @@ def json_to_ndjson(
     
     Parameters
     ----------
-    json_file: pathlib.Path
+    json_file (pathlib.Path):
         Original `.json` file to parse with untokenized comment.
-    out_dir: pathlib.Path
+    out_dir (pathlib.Path):
         Elastic search folder to register the list of tokenized comments.
-    movie_extra: pathlib.Path, optional (default: None)
+    movie_extra (pathlib.Path, default: None)
         Path to additional data on movies as a `.json`file. This aims at 
         adding some extra information on movie reviews from the raw `.xml` 
         dataset.
-    limit: int, optional (default: 200_000)
+    limit (int, default: 200_000):
         Maximum number of comments per file in the output pipeline.
     es_index: str, optional (default: "movie_db")
         Name of the Elastic Search database.
-    std: bool (default: True)
+    std (bool, default: True):
         If True this method will standardize the textual content with preset.
-    nlp: NLP SpaCy model (default: None)
+    nlp (spacy.lang.fr, default: None):
         NLP model to load while parsing the raw dataset. This extra utility 
         helps us to filter out stop words during reviews' preprocessing.
     """
@@ -172,14 +172,14 @@ def gen_dataset(
 
     Parameters
     ----------
-    ds_file: pathlib.Path
+    ds_file (pathlib.Path):
         Path to .json dataset.
-    out_dir: pathlib.Path
+    out_dir (pathlib.Path):
         Output directory that should contain the whole dataset architecture
         in conformity with keras standards.
-    std: bool (default: True)
+    std (bool, default: True):
         If True this method will standardize the textual content with preset.
-    nlp: NLP SpaCy model (default: None)
+    nlp (spacy.lang.fr, default: None):
         NLP model to load while parsing the raw dataset. This extra utility 
         helps us to filter out stop words during reviews' preprocessing.
     """
@@ -219,14 +219,14 @@ def gen_trials(
 
     Parameters
     ----------
-    ds_file: pathlib.Path
+    ds_file (pathlib.Path):
         Path to .json dataset.
-    out_dir: pathlib.Path
+    out_dir (pathlib.Path):
         Output directory that should contain the whole dataset architecture
         in conformity with keras standards.
-    std: bool (default: True)
+    std (bool, default: True):
         If True this method will standardize the textual content with preset.
-    nlp: NLP SpaCy model (default: None)
+    nlp (spacy.lang.fr, default: None):
         NLP model to load while parsing the raw dataset. This extra utility 
         helps us to filter out stop words during reviews' preprocessing.
     """
@@ -282,13 +282,13 @@ if __name__ == "__main__":
                     limit=10_000,
                     movie_extra=pathlib.Path(args.extra) if args.extra else None,
                     es_idx=args.es_idx,
-                    std=args.standardization,
+                    std=args.standardize,
                     nlp=nlp,
                 )
             elif args.out_format == const.TRAIN_FORMAT:
-                gen_dataset(json_file, out, nlp=nlp, std=args.standardization)
+                gen_dataset(json_file, out, nlp=nlp, std=args.standardize)
             elif args.out_format == const.TRIALS_FORMAT:
-                gen_trials(json_file, out, nlp=nlp, std=args.standardization)
+                gen_trials(json_file, out, nlp=nlp, std=args.standardize)
 
             if args.out_format != const.JSON_FORMAT:
                 json_file.unlink()
@@ -302,10 +302,10 @@ if __name__ == "__main__":
                     out,
                     limit=10_000,
                     movie_extra=pathlib.Path(args.extra) if args.extra else None,
-                    std=args.standardization,
+                    std=args.standardize,
                     nlp=nlp,
                 )
             elif args.out_format == const.TRAIN_FORMAT:
-                gen_dataset(json_file, json, out, std=args.standardization, nlp=nlp)
+                gen_dataset(json_file, json, out, std=args.standardize, nlp=nlp)
             elif args.out_format == const.TRIALS_FORMAT:
-                gen_trials(json_file, out, std=args.standardization, nlp=nlp)
+                gen_trials(json_file, out, std=args.standardize, nlp=nlp)

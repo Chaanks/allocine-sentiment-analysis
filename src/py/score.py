@@ -14,12 +14,11 @@ __email__ = [
 __license__ = "MIT"
 
 
-import numpy as np
 import os
-import pandas as pd
+import pandas
 import pickle
 import string
-import tensorflow as tf
+import tensorflow
 import yaml
 
 import const
@@ -38,43 +37,43 @@ if __name__ == "__main__":
     args = parser.parse_args(const.SCORE_MODE)
 
     mod_dir = Path(args.model)
-    test = Path(args.test)
+    trials_path = Path(args.trials)
+
+    with open(mod_dir / const.CFG_OUTPUT_FILE, "r") as file:
+        cfg = yaml.safe_load(file)
 
     # Load pre-trained model
+    model = tensorflow.keras.models.load_model(mod_dir)
+    model.compile(
+        loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"]
+    )
+
+    # Load embedding model
     vl_path = mod_dir / const.VLAYER_OUTPUT_FILE
     vl = pickle.load(open(vl_path, "rb"))
     vlayer = TextVectorization.from_config(vl["config"])
     vlayer.set_weights(vl["weights"])
     # [BUG KERAS] You have to call `adapt` with some dummy data
-    # new_v.adapt(tf.data.Dataset.from_tensor_slices(["xyz"]))
-
-    model = tf.keras.models.load_model(mod_dir)
-    model.compile(
-        loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"]
-    )
+    # new_v.adapt(tensorflow.data.Dataset.from_tensor_slices(["xyz"]))
 
     # A string input
-    inputs = tf.keras.Input(shape=(1,), dtype="string")
+    inputs = tensorflow.keras.Input(shape=(1,), dtype="string")
     # Turn strings into vocab indices
     indices = vlayer(inputs)
     # Turn vocab indices into predictions
     outputs = model(indices)
 
     # Our end to end model
-    end_to_end_model = tf.keras.Model(inputs, outputs)
+    end_to_end_model = tensorflow.keras.Model(inputs, outputs)
     end_to_end_model.compile(
         loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"]
     )
 
-    trials = pd.read_csv(test)
+    trials = pandas.read_csv(trials_path)
 
     preds = []
 
     for index, row in trials.iterrows():
-        text = tf.expand_dims(row["commentaire"], -1)
+        text = tensorflow.expand_dims(row["commentaire"], -1)
         result = end_to_end_model.predict(text)
-        idx = const.IDX_TO_LBL[tf.math.argmax(result)]
-
-    text = tf.expand_dims("mauvais film", -1)
-    result = end_to_end_model.predict(text)
-    print(result)
+        idx = const.IDX_TO_LBL[tensorflow.math.argmax(result)]

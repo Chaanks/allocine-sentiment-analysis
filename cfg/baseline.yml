@@ -1,8 +1,8 @@
 exp: 
   name: 'baseline'
   desc: 'Baseline ConvNet1D network.'
-  epochs: 5
-  batch_size: 512
+  epochs: 1
+  batch_size: 256
   
 corpus:
   voc_len: 20_000

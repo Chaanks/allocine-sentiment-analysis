@@ -25,7 +25,7 @@ REGEXES = [
     ),
     lambda x: re.sub(r"<br />", " ", x),
     lambda x: re.sub(r"[\(|\)]", " ", x),
-    # lambda x: re.sub(r'(.+?)\1{2,}', r'\1\1\1', x),
+    lambda x: re.sub(r"(.+?)\1{2,}", r"\1\1\1", x),
     lambda x: re.sub(r"\s+", " ", x),
 ]
 
@@ -62,6 +62,7 @@ IDX_TO_LBL = {
 
 CFG_OUTPUT_FILE = "cfg.yml"
 VLAYER_OUTPUT_FILE = "tv_layer.pkl"
+TRAIN_LOG_OUTPUT_FILE = "logs.csv"
 
 
 # Errors

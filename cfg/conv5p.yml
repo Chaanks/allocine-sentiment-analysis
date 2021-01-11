@@ -15,10 +15,6 @@ model:
     # Defining 5 parallel convolutionnal networks
     - conv1d:
         filters: 64
-        kernel_size: 2
-        strides: 1
-    - conv1d:
-        filters: 64
         kernel_size: 3
         strides: 1
     - conv1d:
@@ -28,15 +24,19 @@ model:
     - conv1d:
         filters: 64
         kernel_size: 5
-        strides: 1
+        strides: 2
     - conv1d:
         filters: 64
         kernel_size: 6
         strides: 1
+    - conv1d:
+        filters: 64
+        kernel_size: 7
+        strides: 3
     - dropout: 0.5
     - 'global_max_pooling'
     - 'flatten' # outputs aggregation
-    - dense: 256
+    - dense: 512
   loss: 'categorical_crossentropy'
   optimizer: 'adam'
   metrics: 

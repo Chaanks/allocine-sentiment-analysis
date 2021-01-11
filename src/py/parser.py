@@ -25,16 +25,18 @@ def parse_args(mode: str) -> argparse.Namespace:
 
     Parameters
     ----------
-        mode: str
-            Type of process to fire (either 'train' or 'score')
+    mode (str):
+        Type of process to fire (either 'train' or 'score')
     
     Returns
     -------
-        argparse.Namespace: The parsed user arguments from the command line.
+    (argparse.Namespace): 
+        The parsed user arguments from the command line.
     
     Raises
     ------
-        AssertionError: If no running mode is given.
+    (AssertionError): 
+        If no running mode is given.
     """
     assert mode in const.RUNNING_MODES, const.UNKNOWN_RUNNING_MODE(mode)
 
@@ -58,15 +60,29 @@ def parse_args(mode: str) -> argparse.Namespace:
 
     if mode == const.TRAIN_MODE:
         parser.add_argument(
-            "-cfg", "--config", type=str, help="Path to model config file.", required=True
+            "-cfg",
+            "--config",
+            type=str,
+            help="Path to model config file.",
+            required=True,
         )
-        parser.add_argument("-t", "--train", type=str, help="Path to training set.", required=True)
-        parser.add_argument("-d", "--dev", type=str, help="Path to validation set.", required=True)
+        parser.add_argument(
+            "-t", "--train", type=str, help="Path to training set.", required=True
+        )
+        parser.add_argument(
+            "-d", "--dev", type=str, help="Path to validation set.", required=True
+        )
     elif mode == const.SCORE_MODE:
         parser.add_argument(
-            "-m", "--model", type=str, help="Path to directory of the trained model.", required=True
+            "-m",
+            "--model",
+            type=str,
+            help="Path to directory of the trained model.",
+            required=True,
         )
-        parser.add_argument("-t", "--trials", type=str, help="Path to trials.", required=True)
+        parser.add_argument(
+            "-t", "--trials", type=str, help="Path to trials.", required=True
+        )
     elif mode == const.GEN_MODE:
         parser.add_argument(
             "-d",
@@ -96,13 +112,13 @@ def parse_args(mode: str) -> argparse.Namespace:
         )
 
         parser.add_argument(
-            "-sw", "--stopwords", type=str, help="Path to stop words file.",
+            "-sw", "--stopwords", type=str, help=f"[{const.ES_FORMAT.upper()}][{const.TRIALS_FORMAT.upper()}][{const.TRAIN_FORMAT.upper()}] Path to stop words file.",
         )
         parser.add_argument(
-            "-e", "--extra", type=str, help="[ES] Path to movie metadata set.",
+            "-e", "--extra", type=str, help=f"[{const.ES_FORMAT.upper()}] Path to movie metadata set.",
         )
         parser.add_argument(
-            "-ei", "--es_idx", type=str, help="[ES] Name of the ES database.",
+            "-ei", "--es_idx", type=str, help=f"[{const.ES_FORMAT.upper()}] Name of the ES database.",
         )
         parser.add_argument(
             "-std",
@@ -127,18 +143,20 @@ def check_args(mode: str, ns: argparse.Namespace):
 
     Parameters
     ----------
-        mode: str
-            Type of process to fire (either 'train' or 'score')
-        ns: argparse.Namespace
-            Arguments parsed from user input
+    mode (str):
+        Type of process to fire (either 'train' or 'score')
+    ns (argparse.Namespace)
+        Arguments parsed from user input
     
     Returns
     -------
-        argparse.Namespace: The parsed user arguments from the command line.
+    (argparse.Namespace): 
+        The parsed user arguments from the command line.
     
     Raises
     ------
-        ValueError: If user input is wrongly informed.
+    (ValueError): 
+        If user input is wrongly informed.
     """
     if mode == const.TRAIN_MODE:
         pass
