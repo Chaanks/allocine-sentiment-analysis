@@ -17,11 +17,11 @@ __license__ = "MIT"
 import numpy as np
 import os
 import pickle
-import tensorflow as tf
+import tensorflow
 import yaml
 
 import const
-from model import conv_mod
+from model import conv1dmod
 import parser
 import utils
 
@@ -34,21 +34,23 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 def vectorize(text: str, label: float, vlayer: TextVectorization):
-    """Transforms text into floating tensor with its rating.
+    """
+    Transforms text into floating tensor with its rating.
 
     Parameters
     ----------
-        text: tensorflow.python.framework.ops.Tensor
-            Review to vectorize.
-        label: tensorflow.python.framework.ops.Tensor
-            Rating linked with this text.
-        vlayer: tensorflow.python.keras.layers.preprocessing.text_vectorization.TextVectorization
-            Text vectorization model
+    text (tensorflow.python.framework.ops.Tensor):
+        Review to vectorize.
+    label (tensorflow.python.framework.ops.Tensor):
+        Rating linked with this text.
+    vlayer (tensorflow.python.keras.layers.preprocessing.text_vectorization.TextVectorization):
+        Text vectorization model
+
     Returns
     -------
-        (tensor, float): The corresponding floating tensor with its rating.
+    (tensor, float): The corresponding floating tensor with its rating.
     """
-    text = tf.expand_dims(text, -1)
+    text = tensorflow.expand_dims(text, -1)
     return vlayer(text), label
 
 
@@ -69,22 +71,22 @@ if __name__ == "__main__":
     train = Path(args.train)
     dev = Path(args.dev)
 
-    # tf.config.experimental.list_physical_devices('CPU'))
+    # tensorflow.config.experimental.list_physical_devices('CPU'))
 
     # Retrieving dataset
-    raw_train_ds = tf.keras.preprocessing.text_dataset_from_directory(
+    raw_train_ds = tensorflow.keras.preprocessing.text_dataset_from_directory(
         train, label_mode="categorical", batch_size=cfg["exp"]["batch_size"]
     )
-    raw_dev_ds = tf.keras.preprocessing.text_dataset_from_directory(
+    raw_dev_ds = tensorflow.keras.preprocessing.text_dataset_from_directory(
         dev, label_mode="categorical", batch_size=cfg["exp"]["batch_size"]
     )
     logger.info(
         "Number of batches in train set: %d"
-        % tf.data.experimental.cardinality(raw_train_ds)
+        % tensorflow.data.experimental.cardinality(raw_train_ds)
     )
     logger.info(
         "Number of batches in dev set: %d"
-        % tf.data.experimental.cardinality(raw_dev_ds)
+        % tensorflow.data.experimental.cardinality(raw_dev_ds)
     )
 
     # Instanciating word embedding model
@@ -106,16 +108,28 @@ if __name__ == "__main__":
     dev_ds = dev_ds.cache().prefetch(buffer_size=10)
 
     # Fit the model using the train and test datasets.
-    model = conv_mod.ConvMod(
-        len(const.IDX_TO_LBL), 
-        cfg["corpus"]["voc_len"], 
-        cfg["corpus"]["emb_dim"], 
-        cfg["model"]["layers"]
+    model = conv1dmod.Conv1DMod(
+        len(const.IDX_TO_LBL),
+        cfg["corpus"]["voc_len"],
+        cfg["corpus"]["emb_dim"],
+        cfg["model"]["layers"],
     )
     model.compile(
-        loss=cfg['model']['loss'], optimizer=cfg['model']['optimizer'], metrics=cfg['model']['metrics']
+        loss=cfg["model"]["loss"],
+        optimizer=cfg["model"]["optimizer"],
+        metrics=cfg["model"]["metrics"],
     )
-    model.fit(train_ds, validation_data=dev_ds, epochs=cfg["exp"]["epochs"])
+
+    csv_logger = tensorflow.keras.callbacks.CSVLogger(
+        out / const.TRAIN_LOG_OUTPUT_FILE, separator="\t"
+    )
+
+    model.fit(
+        train_ds,
+        validation_data=dev_ds,
+        epochs=cfg["exp"]["epochs"],
+        callbacks=[csv_logger],
+    )
 
     # Save configuration, model and embeddings in `out/` folder
     with open(out / const.CFG_OUTPUT_FILE, "w") as file:
