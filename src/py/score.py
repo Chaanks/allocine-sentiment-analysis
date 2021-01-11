@@ -38,6 +38,9 @@ if __name__ == "__main__":
 
     mod_dir = Path(args.model)
     trials_path = Path(args.trials)
+    out_dir = Path(args.out)
+
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     with open(mod_dir / const.CFG_OUTPUT_FILE, "r") as file:
         cfg = yaml.safe_load(file)
@@ -71,9 +74,13 @@ if __name__ == "__main__":
 
     trials = pandas.read_csv(trials_path)
 
-    preds = []
+    preds = open(out_dir / f"{cfg['exp']['name']}.txt", "w")
 
-    for index, row in trials.iterrows():
-        text = tensorflow.expand_dims(row["commentaire"], -1)
+    for _, review in tqdm(trials.iterrows()):
+        text = tensorflow.expand_dims(review["commentaire"], -1)
         result = end_to_end_model.predict(text)
-        idx = const.IDX_TO_LBL[tensorflow.math.argmax(result)]
+        idx = const.IDX_TO_LBL[tensorflow.math.argmax(result[0])]
+
+        preds.write(f"{review['review_id']} {idx}\n")
+
+    preds.close()

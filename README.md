@@ -50,12 +50,12 @@ optional arguments:
   -of {json,es,score,run}, --out_format {json,es,score,run}
                         Output file format.
   -sw STOPWORDS, --stopwords STOPWORDS
-                        Path to stop words file.
+                        [ES][SCORE][RUN] Path to stop words file.
   -e EXTRA, --extra EXTRA
                         [ES] Path to movie metadata set.
   -ei ES_IDX, --es_idx ES_IDX
                         [ES] Name of the ES database.
-  -std, --standardize   Review content standardization.
+  -std, --standardize   [ES][SCORE][RUN] Review content standardization.
 ```
 
 #### JSON
@@ -98,6 +98,11 @@ optional arguments:
   -d DEV, --dev DEV     Path to validation set.
 ```
 
+#### Example:
+```shell
+$ python3 src/py/run.py -cfg cfg/conv5p.yml -t data/keras/train -d data/keras/dev data/model/conv5p
+```
+
 ### Evaluating a pre-trained model
 ```shell
 usage: score.py [-h] -m MODEL -t TRIALS out
@@ -115,15 +120,19 @@ optional arguments:
                         Path to trials.
 ```
 
+```shell
+$ python3 src/py/score.py -m data/model/conv5p -t data/csv/test.csv out/
+```
+
 ## To Do
 - [x] Code refactor
 - [x] Documentation
 - [x] Config file management
 - [x] Data generation
-- [ ] CNN improvement (5 convolutions instead of 2)
-  - [ ] Functional testing
-  - [ ] Fix
-  - [ ] Implementation
+- [x] CNN improvement (5 convolutions instead of 2)
+  - [x] Functional testing
+  - [x] Fix
+  - [x] Implementation
 - [ ] User embedding generation
 - [ ] Director one hot encoding on all corpus (train, dev and test)
 - [ ] Genre multi-encoding for all films (train, dev and test)
