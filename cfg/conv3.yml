@@ -1,0 +1,36 @@
+exp: 
+  name: 'ConvNet3P'
+  desc: '3 parallel convolutional layers aggregated with a DNN before passing throught the output layer'
+  epochs: 5
+  batch_size: 256
+
+corpus:
+  voc_len: 20_000
+  seq_len: 1_000
+  emb_dim: 128
+
+model:
+  layers:
+    # Defining 5 parallel convolutionnal networks
+    - conv1d:
+        filters: 64
+        kernel_size: 7
+        strides: 3
+    - 'global_max_pooling'
+    - conv1d:
+        filters: 64
+        kernel_size: 5
+        strides: 2
+    - 'global_max_pooling'
+    - conv1d:
+        filters: 64
+        kernel_size: 3
+        strides: 1
+    - dropout: 0.5
+    - 'global_max_pooling'
+    - 'flatten' # outputs aggregation
+    - dense: 256
+  loss: 'categorical_crossentropy'
+  optimizer: 'nadam'
+  metrics: 
+    - 'accuracy'
