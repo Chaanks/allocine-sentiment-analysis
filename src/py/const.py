@@ -45,6 +45,9 @@ OUT_FORMATS = [JSON_FORMAT, ES_FORMAT, TRIALS_FORMAT, TRAIN_FORMAT]
 
 TRIALS_FILENAME = "trials.csv"
 
+MODEL_PAR = "conv1dpar"
+MODEL_SEQ = "conv1dseq"
+MODELS = [MODEL_PAR, MODEL_SEQ]
 
 # Model
 IDX_TO_LBL = {
@@ -87,3 +90,4 @@ UNKNOWN_LAYER_TYPE = lambda m: f"\033[1;33mUnknown layer for {m}.\033[0m"
 NO_STD_FOR_JSON_FORMAT = f"""\033[1;33m\
 Review standardization is not an available option for {JSON_FORMAT} output.\
 \033[0m"""
+WRONG_CONFIG_FILE = lambda model: f"\033[1;33mWrong configuration file for {model}.\033[0m"

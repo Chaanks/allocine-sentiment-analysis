@@ -67,6 +67,14 @@ def parse_args(mode: str) -> argparse.Namespace:
             required=True,
         )
         parser.add_argument(
+            "-m",
+            "--model",
+            type=str,
+            help="Type of model to choose",
+            required=True,
+            choices=const.MODELS,
+        )
+        parser.add_argument(
             "-t", "--train", type=str, help="Path to training set.", required=True
         )
         parser.add_argument(

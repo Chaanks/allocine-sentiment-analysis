@@ -20,10 +20,10 @@ model:
         filters: 64
         kernel_size: 7
         strides: 3
-    - dropout: 0.5
     - 'global_max_pooling'
     - 'flatten'
     - dense: 128
+    - dropout: 0.5
   loss: 'categorical_crossentropy'
   optimizer: 'adam'
   metrics: 

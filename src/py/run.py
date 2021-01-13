@@ -14,6 +14,7 @@ __email__ = [
 __license__ = "MIT"
 
 
+import argparse
 import numpy as np
 import os
 import pickle
@@ -21,7 +22,7 @@ import tensorflow
 import yaml
 
 import const
-from model import conv1dmod
+from model import conv1dseq, conv1dpar
 import parser
 import utils
 
@@ -52,6 +53,49 @@ def vectorize(text: str, label: float, vlayer: TextVectorization):
     """
     text = tensorflow.expand_dims(text, -1)
     return vlayer(text), label
+
+
+def build_model(mtype: str, cfg: argparse.Namespace) -> conv1dpar.Conv1DPar or conv1dseq.Conv1DSeq or baseline.CNNBaseline:
+    """
+    Builds the model given a model type and a configuration.
+
+    Parameters
+    ----------
+    mtype (str):
+        Type of model to instanciate.
+    cfg (argparse.Namespace):
+        The configuration of the model.
+
+    Returns
+    -------
+    (conv1dmod.Conv1DPar or conv1dseq.Conv1DSeq or baseline.CNNBaseline):
+        The model.
+
+    Raises
+    ------
+    (AssertionError):
+        If the configuration file given for the model does not contain the 
+        appropriate structure.
+    """
+    if mtype == const.MODEL_PAR:
+        assert 'num_filters' in cfg['model'] and 'convs' in cfg['model'] and 'dropout' in cfg['model'], const.WRONG_CONFIG_FILE(mtype)
+        return conv1dpar.Conv1DPar(
+            len(const.IDX_TO_LBL),
+            cfg["corpus"]["voc_len"],
+            cfg["corpus"]["emb_dim"],
+            cfg["model"]["dropout"],
+            cfg["model"]["num_filters"],
+            cfg["model"]["convs"],
+            cfg["model"]["fc_dim"],
+        )
+    else:
+        assert 'layers' in cfg['model'], const.WRONG_CONFIG_FILE(mtype)
+        return con1dseq.Conv1DSeq(
+            len(const.IDX_TO_LBL),
+            cfg["corpus"]["voc_len"],
+            cfg["corpus"]["emb_dim"],
+            cfg["model"]["layers"],
+        )
 
 
 if __name__ == "__main__":
@@ -108,12 +152,7 @@ if __name__ == "__main__":
         dev_ds = dev_ds.cache().prefetch(buffer_size=10)
 
     # Fit the model using the train and test datasets.
-    model = conv1dmod.Conv1DMod(
-        len(const.IDX_TO_LBL),
-        cfg["corpus"]["voc_len"],
-        cfg["corpus"]["emb_dim"],
-        cfg["model"]["layers"],
-    )
+    model = build_model(args.model, cfg)
     model.compile(
         loss=cfg["model"]["loss"],
         optimizer=cfg["model"]["optimizer"],

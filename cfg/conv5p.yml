@@ -2,7 +2,7 @@ exp:
   name: 'ConvNet5P'
   desc: '5 parallel convolutional layers aggregated with a DNN before passing throught the output layer'
   epochs: 5
-  batch_size: 512
+  batch_size: 256
 
 corpus:
   voc_len: 20_000
@@ -10,34 +10,22 @@ corpus:
   emb_dim: 128
 
 model:
-  layers:
-    - dropout: 0.5
+  dropout: 0.3
+  num_filters: 64 
+  convs:
     # Defining 5 parallel convolutionnal networks
-    - conv1d:
-        filters: 64
-        kernel_size: 3
-        strides: 1
-    - conv1d:
-        filters: 64
-        kernel_size: 4
-        strides: 1
-    - conv1d:
-        filters: 64
-        kernel_size: 5
-        strides: 2
-    - conv1d:
-        filters: 64
-        kernel_size: 6
-        strides: 1
-    - conv1d:
-        filters: 64
-        kernel_size: 7
-        strides: 3
-    - dropout: 0.5
-    - 'global_max_pooling'
-    - 'flatten' # outputs aggregation
-    - dense: 512
+    - kernel: 2
+      strides: 1
+    - kernel: 3
+      strides: 1
+    - kernel: 4
+      strides: 1
+    - kernel: 5
+      strides: 1
+    - kernel: 6
+      strides: 1
+  fc_dim: 256
   loss: 'categorical_crossentropy'
-  optimizer: 'adam'
+  optimizer: 'nadam'
   metrics: 
     - 'accuracy'

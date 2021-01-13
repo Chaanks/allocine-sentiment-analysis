@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""cnn_expanded.py: Modular CNN architecture based on configuration."""
+"""conv1dseq.py: 
+    CNN defined with a sequence of convolutional layers given a configuration 
+    file. For our baseline implementation credits to:
+        * https://missinglink.ai/guides/keras/keras-conv1d-working-1d-convolutional-neural-networks-keras/
+        * https://machinelearningmastery.com/cnn-models-for-human-activity-recognition-time-series-classification/
+"""
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
@@ -19,10 +24,11 @@ import tensorflow
 import const
 
 
-class Conv1DMod(tensorflow.keras.Model):
+class Conv1DSeq(tensorflow.keras.Model):
     """
-    `Conv1DMod` is a modular convolutional class aimed at defining an
-    architecture from a list of `keras.layers` entities.
+    `Conv1DSeq` is a modular convolutional class aimed at defining an
+    architecture from a list of `keras.layers` entities stored in a 
+    `tensorflow.keras.models.Sequential()` module.
 
     Attributes
     ----------
@@ -36,7 +42,7 @@ class Conv1DMod(tensorflow.keras.Model):
     def __init__(
         self, out_dim: int, voc_len: int, emb_dim: int, layers: list,
     ):
-        super(Conv1DMod, self).__init__()
+        super(Conv1DSeq, self).__init__()
 
         self.embedding = tensorflow.keras.layers.Embedding(voc_len, emb_dim)
 
