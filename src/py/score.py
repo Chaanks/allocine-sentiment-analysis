@@ -25,9 +25,10 @@ import const
 import parser
 
 from loguru import logger
-from model.cnn_baseline import CNNBaseline
 from pathlib import Path
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
+
+from model import conv_par, conv_seq
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"

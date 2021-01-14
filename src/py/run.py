@@ -22,13 +22,14 @@ import tensorflow
 import yaml
 
 import const
-from model import conv1dseq, conv1dpar
 import parser
 import utils
 
 from loguru import logger
 from pathlib import Path
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
+
+from model import conv_seq, conv_par
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -55,7 +56,7 @@ def vectorize(text: str, label: float, vlayer: TextVectorization):
     return vlayer(text), label
 
 
-def build_model(mtype: str, cfg: argparse.Namespace) -> conv1dpar.Conv1DPar or conv1dseq.Conv1DSeq or baseline.CNNBaseline:
+def build_model(mtype: str, cfg: argparse.Namespace) -> conv_par.ConvPar or conv_seq.ConvSeq:
     """
     Builds the model given a model type and a configuration.
 
@@ -68,7 +69,7 @@ def build_model(mtype: str, cfg: argparse.Namespace) -> conv1dpar.Conv1DPar or c
 
     Returns
     -------
-    (conv1dmod.Conv1DPar or conv1dseq.Conv1DSeq or baseline.CNNBaseline):
+    (conv_par.ConvPar or conv_seq.ConvSeq):
         The model.
 
     Raises
@@ -77,9 +78,11 @@ def build_model(mtype: str, cfg: argparse.Namespace) -> conv1dpar.Conv1DPar or c
         If the configuration file given for the model does not contain the 
         appropriate structure.
     """
+    assert 'emb_dim' in cfg['corpus'] and 'voc_len' in cfg['corpus'], const.WRONG_CORPUS_DEFINITION
+
     if mtype == const.MODEL_PAR:
         assert 'num_filters' in cfg['model'] and 'convs' in cfg['model'] and 'dropout' in cfg['model'], const.WRONG_CONFIG_FILE(mtype)
-        return conv1dpar.Conv1DPar(
+        return conv_par.ConvPar(
             len(const.IDX_TO_LBL),
             cfg["corpus"]["voc_len"],
             cfg["corpus"]["emb_dim"],
@@ -90,7 +93,7 @@ def build_model(mtype: str, cfg: argparse.Namespace) -> conv1dpar.Conv1DPar or c
         )
     else:
         assert 'layers' in cfg['model'], const.WRONG_CONFIG_FILE(mtype)
-        return con1dseq.Conv1DSeq(
+        return conv_seq.ConvSeq(
             len(const.IDX_TO_LBL),
             cfg["corpus"]["voc_len"],
             cfg["corpus"]["emb_dim"],

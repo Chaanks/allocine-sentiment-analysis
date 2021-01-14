@@ -1,0 +1,30 @@
+exp: 
+  name: 'ConvNetOMG'
+  desc: '3 parallel convolutional layers aggregated with a DNN before passing throught the output layer'
+  epochs: 5
+  batch_size: 64
+
+corpus:
+  voc_len: 20_000
+  seq_len: 1_000
+  emb_dim: 300
+
+model:
+  layers:
+    #- dropout: 0.3
+    # Defining 5 parallel convolutionnal networks
+    - conv1d:
+        filters: 256
+        kernel_size: 3
+        strides: 1
+    - conv1d:
+        filters: 512
+        kernel_size: 4
+        strides: 2
+    - 'max_pooling'
+    - 'flatten' # outputs aggregation
+    - dense: 128
+  loss: 'categorical_crossentropy'
+  optimizer: 'nadam'
+  metrics: 
+    - 'accuracy'
