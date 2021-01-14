@@ -5,7 +5,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.5.0"
+__version__ = "2.0.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",

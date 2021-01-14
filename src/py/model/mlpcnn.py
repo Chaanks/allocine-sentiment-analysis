@@ -1,3 +1,19 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""mlpcnn.py: Fine tuned model."""
+
+__authors__ = ["Jarod Duret", "Jonathan Heno"]
+__credits__ = ["Jarod Duret", "Jonathan Heno"]
+__version__ = "2.0.0"
+__maintainers__ = ["Jarod Duret", "Jonathan Heno"]
+__email__ = [
+    "jarod.duret@alumni.univ-avignon.fr",
+    "jonathan.heno@alumni.univ-avignon.fr",
+]
+__license__ = "MIT"
+
+
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras import backend as K
@@ -7,21 +23,20 @@ from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
 
 def create_mlp(preprocessing, inputs):
-	# return our model
-    body = tf.keras.Sequential([
-        layers.Dense(128, activation="relu"),
-        layers.Dense(128, activation="linear")
-    ])
+    # return our model
+    body = tf.keras.Sequential(
+        [layers.Dense(128, activation="relu"), layers.Dense(128, activation="linear")]
+    )
 
     preprocessed_inputs = preprocessing(inputs)
     result = body(preprocessed_inputs)
-    
+
     return tf.keras.Model(inputs, result)
+
 
 def create_cnn(max_features, embedding_dim, vectorize_layer):
     # A integer input for vocab indices.
     inputs = tf.keras.Input(shape=(None,), dtype="int32")
-    
 
     # Next, we add a layer to map those vocab indices into a space of dimensionality
     # 'embedding_dim'.
@@ -35,15 +50,16 @@ def create_cnn(max_features, embedding_dim, vectorize_layer):
     x = tf.keras.layers.Flatten()(x)
 
     model = tf.keras.Model(inputs, x)
-    
+
     # A string input
     inputs = tf.keras.Input(shape=(1,), dtype="string")
     # Turn strings into vocab indices
     indices = vectorize_layer(inputs)
     # Turn vocab indices into predictions
     outputs = model(indices)
-    
+
     return tf.keras.Model(inputs, outputs)
+
 
 def create_model(feats_encoder, inputs, reviews_encoder, max_features, embedding_dim):
     # create the MLP and CNN models

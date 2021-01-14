@@ -10,7 +10,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.5.0"
+__version__ = "2.0.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -39,6 +39,7 @@ class ConvSeq(tensorflow.keras.Model):
         The sequence of layers to include during the processing phase. Those 
         are defined in the configuration file, in the `model.layers` section.
     """
+
     def __init__(
         self, out_dim: int, voc_len: int, emb_dim: int, layers: list,
     ):

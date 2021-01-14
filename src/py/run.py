@@ -5,7 +5,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.5.0"
+__version__ = "2.0.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -56,7 +56,9 @@ def vectorize(text: str, label: float, vlayer: TextVectorization):
     return vlayer(text), label
 
 
-def build_model(mtype: str, cfg: argparse.Namespace) -> conv_par.ConvPar or conv_seq.ConvSeq:
+def build_model(
+    mtype: str, cfg: argparse.Namespace
+) -> conv_par.ConvPar or conv_seq.ConvSeq:
     """
     Builds the model given a model type and a configuration.
 
@@ -78,10 +80,16 @@ def build_model(mtype: str, cfg: argparse.Namespace) -> conv_par.ConvPar or conv
         If the configuration file given for the model does not contain the 
         appropriate structure.
     """
-    assert 'emb_dim' in cfg['corpus'] and 'voc_len' in cfg['corpus'], const.WRONG_CORPUS_DEFINITION
+    assert (
+        "emb_dim" in cfg["corpus"] and "voc_len" in cfg["corpus"]
+    ), const.WRONG_CORPUS_DEFINITION
 
     if mtype == const.MODEL_PAR:
-        assert 'num_filters' in cfg['model'] and 'convs' in cfg['model'] and 'dropout' in cfg['model'], const.WRONG_CONFIG_FILE(mtype)
+        assert (
+            "num_filters" in cfg["model"]
+            and "convs" in cfg["model"]
+            and "dropout" in cfg["model"]
+        ), const.WRONG_CONFIG_FILE(mtype)
         return conv_par.ConvPar(
             len(const.IDX_TO_LBL),
             cfg["corpus"]["voc_len"],
@@ -92,7 +100,7 @@ def build_model(mtype: str, cfg: argparse.Namespace) -> conv_par.ConvPar or conv
             cfg["model"]["fc_dim"],
         )
     else:
-        assert 'layers' in cfg['model'], const.WRONG_CONFIG_FILE(mtype)
+        assert "layers" in cfg["model"], const.WRONG_CONFIG_FILE(mtype)
         return conv_seq.ConvSeq(
             len(const.IDX_TO_LBL),
             cfg["corpus"]["voc_len"],
@@ -175,9 +183,7 @@ if __name__ == "__main__":
         )
     else:
         model.fit(
-            train_ds,
-            epochs=cfg["exp"]["epochs"],
-            callbacks=[csv_logger],
+            train_ds, epochs=cfg["exp"]["epochs"], callbacks=[csv_logger],
         )
 
     # Save configuration, model and embeddings in `out/` folder

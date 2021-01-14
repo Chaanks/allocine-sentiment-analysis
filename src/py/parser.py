@@ -5,7 +5,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.5.0"
+__version__ = "2.0.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -77,9 +77,7 @@ def parse_args(mode: str) -> argparse.Namespace:
         parser.add_argument(
             "-t", "--train", type=str, help="Path to training set.", required=True
         )
-        parser.add_argument(
-            "-d", "--dev", type=str, help="Path to validation set."
-        )
+        parser.add_argument("-d", "--dev", type=str, help="Path to validation set.")
     elif mode == const.SCORE_MODE:
         parser.add_argument(
             "-m",
@@ -120,13 +118,22 @@ def parse_args(mode: str) -> argparse.Namespace:
         )
 
         parser.add_argument(
-            "-sw", "--stopwords", type=str, help=f"[{const.ES_FORMAT.upper()}][{const.TRIALS_FORMAT.upper()}][{const.TRAIN_FORMAT.upper()}] Path to stop words file.",
+            "-sw",
+            "--stopwords",
+            type=str,
+            help=f"[{const.ES_FORMAT.upper()}][{const.TRIALS_FORMAT.upper()}][{const.TRAIN_FORMAT.upper()}] Path to stop words file.",
         )
         parser.add_argument(
-            "-e", "--extra", type=str, help=f"[{const.ES_FORMAT.upper()}] Path to movie metadata set.",
+            "-e",
+            "--extra",
+            type=str,
+            help=f"[{const.ES_FORMAT.upper()}] Path to movie metadata set.",
         )
         parser.add_argument(
-            "-ei", "--es_idx", type=str, help=f"[{const.ES_FORMAT.upper()}] Name of the ES database.",
+            "-ei",
+            "--es_idx",
+            type=str,
+            help=f"[{const.ES_FORMAT.upper()}] Name of the ES database.",
         )
         parser.add_argument(
             "-std",

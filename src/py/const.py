@@ -5,7 +5,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.5.0"
+__version__ = "2.0.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -90,5 +90,7 @@ UNKNOWN_LAYER_TYPE = lambda m: f"\033[1;33mUnknown layer for {m}.\033[0m"
 NO_STD_FOR_JSON_FORMAT = f"""\033[1;33m\
 Review standardization is not an available option for {JSON_FORMAT} output.\
 \033[0m"""
-WRONG_CONFIG_FILE = lambda model: f"\033[1;33mWrong configuration file for {model}.\033[0m"
+WRONG_CONFIG_FILE = (
+    lambda model: f"\033[1;33mWrong configuration file for {model}.\033[0m"
+)
 WRONG_CORPUS_DEFINITION = f"\033[1;33mMissing fields for corpus definition.\033[0m"

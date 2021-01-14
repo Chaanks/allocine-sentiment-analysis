@@ -10,7 +10,7 @@
 
 __authors__ = ["Jarod Duret", "Jonathan Heno"]
 __credits__ = ["Jarod Duret", "Jonathan Heno"]
-__version__ = "1.5.0"
+__version__ = "2.0.0"
 __maintainers__ = ["Jarod Duret", "Jonathan Heno"]
 __email__ = [
     "jarod.duret@alumni.univ-avignon.fr",
@@ -45,6 +45,7 @@ class ConvPar(tf.keras.Model):
     pooling (tensorflow.keras.layers.GlobalMaxPooling1D):
         Type of pooling to apply to each convolutional layer.
     """
+
     def __init__(
         self,
         out_dim: int,
@@ -53,23 +54,30 @@ class ConvPar(tf.keras.Model):
         dropout: float,
         num_filters: int,
         convs: list,
-        fc_dim: int
+        fc_dim: int,
     ):
         super(ConvPar, self).__init__()
 
         self.emdedding = layers.Embedding(voc_len, emb_dim)
         self.dropout = layers.Dropout(dropout)
         self.batch_norm = layers.BatchNormalization()
-        
+
         self.convs = [
-            (layers.Conv1D(num_filters, conv['kernel'], strides=conv['strides'], padding="valid", activation="relu"))
+            (
+                layers.Conv1D(
+                    num_filters,
+                    conv["kernel"],
+                    strides=conv["strides"],
+                    padding="valid",
+                    activation="relu",
+                )
+            )
             for conv in convs
         ]
         self.pooling = layers.GlobalMaxPooling1D()
 
         self.dense1 = layers.Dense(fc_dim, activation="relu", name="name")
         self.dense2 = layers.Dense(out_dim, activation="softmax", name="predictions")
-    
 
     def call(self, inputs, training=False):
         x = self.emdedding(inputs)
