@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""conv1dseq.py: 
+"""conv_seq.py: 
     CNN defined with a sequence of convolutional layers given a configuration 
     file. For our baseline implementation credits to:
         * https://missinglink.ai/guides/keras/keras-conv1d-working-1d-convolutional-neural-networks-keras/
@@ -24,9 +24,9 @@ import tensorflow
 import const
 
 
-class Conv1DSeq(tensorflow.keras.Model):
+class ConvSeq(tensorflow.keras.Model):
     """
-    `Conv1DSeq` is a modular convolutional class aimed at defining an
+    `ConvSeq` is a modular convolutional class aimed at defining an
     architecture from a list of `keras.layers` entities stored in a 
     `tensorflow.keras.models.Sequential()` module.
 
@@ -42,7 +42,7 @@ class Conv1DSeq(tensorflow.keras.Model):
     def __init__(
         self, out_dim: int, voc_len: int, emb_dim: int, layers: list,
     ):
-        super(Conv1DSeq, self).__init__()
+        super(ConvSeq, self).__init__()
 
         self.embedding = tensorflow.keras.layers.Embedding(voc_len, emb_dim)
 
@@ -69,6 +69,8 @@ class Conv1DSeq(tensorflow.keras.Model):
             elif isinstance(layer, str):
                 if layer == "global_max_pooling":
                     self.model.add(tensorflow.keras.layers.GlobalMaxPooling1D())
+                elif layer == "max_pooling":
+                    self.model.add(tensorflow.keras.layers.MaxPooling1D())
                 elif layer == "flatten":
                     self.model.add(tensorflow.keras.layers.Flatten())
                 else:

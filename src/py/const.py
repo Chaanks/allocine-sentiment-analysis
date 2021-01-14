@@ -45,8 +45,8 @@ OUT_FORMATS = [JSON_FORMAT, ES_FORMAT, TRIALS_FORMAT, TRAIN_FORMAT]
 
 TRIALS_FILENAME = "trials.csv"
 
-MODEL_PAR = "conv1dpar"
-MODEL_SEQ = "conv1dseq"
+MODEL_PAR = "conv_par"
+MODEL_SEQ = "conv_seq"
 MODELS = [MODEL_PAR, MODEL_SEQ]
 
 # Model
@@ -91,3 +91,4 @@ NO_STD_FOR_JSON_FORMAT = f"""\033[1;33m\
 Review standardization is not an available option for {JSON_FORMAT} output.\
 \033[0m"""
 WRONG_CONFIG_FILE = lambda model: f"\033[1;33mWrong configuration file for {model}.\033[0m"
+WRONG_CORPUS_DEFINITION = f"\033[1;33mMissing fields for corpus definition.\033[0m"

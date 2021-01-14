@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""conv1dpar.py: 
+"""conv_par.py: 
     CNN with parallels convolutional layers.
     For baseline implementation credits to:
         * https://missinglink.ai/guides/keras/keras-conv1d-working-1d-convolutional-neural-networks-keras/
@@ -24,9 +24,9 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 
-class Conv1DPar(tf.keras.Model):
+class ConvPar(tf.keras.Model):
     """
-    `Conv1DPar` is a modular convolutional class aimed at defining a CNN
+    `ConvPar` is a modular convolutional class aimed at defining a CNN
     architecture, from a list of parallel convolutional layers.
 
     Attributes
@@ -55,7 +55,7 @@ class Conv1DPar(tf.keras.Model):
         convs: list,
         fc_dim: int
     ):
-        super(Conv1DPar, self).__init__()
+        super(ConvPar, self).__init__()
 
         self.emdedding = layers.Embedding(voc_len, emb_dim)
         self.dropout = layers.Dropout(dropout)
